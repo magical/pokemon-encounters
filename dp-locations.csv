@@ -1,0 +1,184 @@
+id,location,area,terrain
+0,Canalave City,,
+1,Eterna City,,
+2,Pastoria City,,
+3,Sunyshore City,,
+4,Pokemon League,,
+5,Oreburgh Mine,1F,cave
+6,Oreburgh Mine,B1F,cave
+7,Valley Windworks,,grass
+8,Eterna Forest,,grass
+9,Fuego Ironworks,,grass
+10,Mt. Coronet,Route 207,cave
+11,Mt. Coronet,2F,cave
+12,Mt. Coronet,3F,cave
+13,Mt. Coronet,snowfall,grass
+14,Mt. Coronet,blizzard,grass
+15,Mt. Coronet,4F,cave
+16,Mt. Coronet,5F,cave
+17,Mt. Coronet,6F,cave
+18,Mt. Coronet,7F,cave
+19,Mt. Coronet,cave,cave
+20,Mt. Coronet,Route 216,cave
+21,Mt. Coronet,Route 211,cave
+22,Mt. Coronet,B1F,cave
+23,Great Marsh,Area 1,marsh
+24,Great Marsh,Area 2,marsh
+25,Great Marsh,Area 3,marsh
+26,Great Marsh,Area 4,marsh
+27,Great Marsh,Area 5,marsh
+28,Great Marsh,Area 6,marsh
+29,Solaceon Ruins,2F,floor
+30,Solaceon Ruins,1F,floor
+31,Solaceon Ruins,B1F a,floor
+32,Solaceon Ruins,B1F b,floor
+33,Solaceon Ruins,B1F c,floor
+34,Solaceon Ruins,B2F a,floor
+35,Solaceon Ruins,B2F b,floor
+36,Solaceon Ruins,B2F c,floor
+37,Solaceon Ruins,B3F a,floor
+38,Solaceon Ruins,B3F b,floor
+39,Solaceon Ruins,B3F c,floor
+40,Solaceon Ruins,B3F d,floor
+41,Solaceon Ruins,B3F e,floor
+42,Solaceon Ruins,B4F a,floor
+43,Solaceon Ruins,B4F b,floor
+44,Solaceon Ruins,B4F c,floor
+45,Solaceon Ruins,B4F d,floor
+46,Solaceon Ruins,B5F,floor
+47,Victory Road,1F,cave
+48,Victory Road,2F,cave
+49,Victory Road,B1F,cave
+50,Victory Road,inside B1F,cave
+51,Victory Road,inside,cave
+52,Victory Road,inside exit,cave
+53,Ravaged Path,,cave
+54,Oreburgh Tunnel,1F,cave
+55,Oreburgh Tunnel,B1F,cave
+56,Stark Mountain,,grass
+57,Stark Mountain,entrance,cave
+58,Stark Mountain,inside,cave
+59,Spring Path,,grass
+60,Turnback Cave,up to Pillar 2 (alternate),cave
+61,Turnback Cave,up to Pillar 2,cave
+62,Turnback Cave,up to Pillar 2,cave
+63,Turnback Cave,up to Pillar 1,cave
+64,Turnback Cave,up to Pillar 1,cave
+65,Turnback Cave,up to Pillar 1,cave
+66,Turnback Cave,up to Pillar 1,cave
+67,Turnback Cave,up to Pillar 1,cave
+68,Turnback Cave,up to Pillar 1,cave
+69,Turnback Cave,up to Pillar 2 (alternate),cave
+70,Turnback Cave,up to Pillar 2 (alternate),cave
+71,Turnback Cave,up to Pillar 2 (alternate),cave
+72,Turnback Cave,up to Pillar 2 (alternate),cave
+73,Turnback Cave,up to Pillar 2 (alternate),cave
+74,Turnback Cave,up to Pillar 2 (alternate),cave
+75,Turnback Cave,up to Pillar 3,cave
+76,Turnback Cave,up to Pillar 3,cave
+77,Turnback Cave,up to Pillar 3,cave
+78,Turnback Cave,up to Pillar 3,cave
+79,Turnback Cave,up to Pillar 3,cave
+80,Turnback Cave,up to Pillar 3,cave
+81,Turnback Cave,up to Pillar 2,cave
+82,Turnback Cave,up to Pillar 2,cave
+83,Turnback Cave,up to Pillar 2,cave
+84,Turnback Cave,up to Pillar 2,cave
+85,Turnback Cave,up to Pillar 2,cave
+86,Turnback Cave,up to Pillar 2,cave
+87,Turnback Cave,up to Pillar 2,cave
+88,Turnback Cave,up to Pillar 2,cave
+89,Turnback Cave,up to Pillar 2,cave
+90,Turnback Cave,up to Pillar 2,cave
+91,Turnback Cave,up to Pillar 2,cave
+92,Turnback Cave,up to Pillar 2,cave
+93,Turnback Cave,up to Pillar 2,cave
+94,Turnback Cave,up to Pillar 2,cave
+95,Turnback Cave,up to Pillar 2,cave
+96,Turnback Cave,up to Pillar 2,cave
+97,Turnback Cave,up to Pillar 2,cave
+98,Turnback Cave,up to Pillar 2,cave
+99,Turnback Cave,up to Pillar 2,cave
+100,Turnback Cave,up to Pillar 2,cave
+101,Turnback Cave,up to Pillar 2,cave
+102,Turnback Cave,up to Pillar 2,cave
+103,Turnback Cave,up to Pillar 2,cave
+104,Turnback Cave,up to Pillar 2,cave
+105,Turnback Cave,up to Pillar 2,cave
+106,Snowpoint Temple,1F,cave
+107,Snowpoint Temple,B1F,cave
+108,Snowpoint Temple,B2F,cave
+109,Snowpoint Temple,B3F,cave
+110,Snowpoint Temple,B4F,cave
+111,Snowpoint Temple,B5F,cave
+112,Wayward Cave,1F,cave
+113,Wayward Cave,B1F,cave
+114,Ruins Maniac Tunnel,0-9 different Unown seen,cave
+115,Ruins Maniac Tunnel,10-25 different Unown seen,cave
+116,Ruins Maniac Tunnel,26+ different Unown seen,cave
+117,Trophy Garden,,grass
+118,Iron Island,,cave
+119,Iron Island,1F,cave
+120,Iron Island,B1F left,cave
+121,Iron Island,B1F right,cave
+122,Iron Island,B2F right,cave
+123,Iron Island,B2F left,cave
+124,Iron Island,B3F,cave
+125,Old Chateau,,floor
+126,Old Chateau,,floor
+127,Old Chateau,,floor
+128,Old Chateau,,floor
+129,Old Chateau,,floor
+130,Old Chateau,2F room with TV,floor
+131,Old Chateau,,floor
+132,Old Chateau,2F room with eyes,floor
+133,Old Chateau,,floor
+134,Lake Verity,before Galactic intervention,grass
+135,Lake Verity,after Galactic intervention,grass
+136,Lake Valor,,grass
+137,Lake Acuity,,grass
+138,Valor Lakefront,,grass
+139,Acuity Lakefront,,grass
+140,Route 201,,grass
+141,Route 202,,grass
+142,Route 203,,grass
+143,Route 204,"south, towards Jubilife City",grass
+144,Route 204,"north, towards Floaroma City",grass
+145,Route 205,"south, towards Floaroma City",grass
+146,Route 205,"east, towards Eterna City",grass
+147,Route 206,,grass
+148,Route 207,,grass
+149,Route 208,,grass
+150,Route 209,,grass
+151,Lost Tower,1F,floor
+152,Lost Tower,2F,floor
+153,Lost Tower,3F,floor
+154,Lost Tower,4F,floor
+155,Lost Tower,5F,floor
+156,Route 210,"south, towards Solaceon Town",grass
+157,Route 210,"west, towards Celestic Town",grass
+158,Route 211,"west, towards Eterna City",grass
+159,Route 211,"east, towards Celestic Town",grass
+160,Route 212,"north, towards Hearthome City",grass
+161,Route 212,"east, towards Pastoria City",grass
+162,Route 213,,grass
+163,Route 214,,grass
+164,Route 215,,grass
+165,Route 216,,grass
+166,Route 217,,grass
+167,Route 218,,grass
+168,Route 219,,grass
+169,Route 221,,grass
+170,Route 222,,grass
+171,Route 224,,grass
+172,Route 225,,grass
+173,Route 227,,grass
+174,Route 228,,grass
+175,Route 229,,grass
+176,Twinleaf Town,,
+177,Celestic City,,
+178,Resort Area,,
+179,Route 220,,
+180,Route 223,,
+181,Route 226,,
+182,Route 230,,
