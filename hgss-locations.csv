@@ -1,143 +1,143 @@
-id,location,area,terrain
-66,Blackthorn City,,
-29,Burned Tower,1F,floor
-30,Burned Tower,B1F,floor
-100,Celadon City,,
-98,Cerulean City,,
-3,Cherrygrove City,,
-52,Cianwood City,,
-96,Cinnabar Island,,
-71,Dark Cave,Blackthorn City entrance,cave
-70,Dark Cave,Violet City entrance,cave
-134,Diglett's Cave,,cave
-67,Dragon's Den,,
-28,Ecruteak City,,
-101,Fuchsia City,,
-61,Ice Cave,1F,cave
-62,Ice Cave,B1F,cave
-63,Ice Cave,B2F,cave
-64,Ice Cave,B3F,cave
-21,Ilex Forest,,grass
-59,Lake of Rage,,
-107,Mt. Moon,1F,cave
-108,Mt. Moon,2F,cave
-73,Mt. Moon,outside,
-54,Mt. Mortar,1F,cave
-57,Mt. Mortar,B1F,cave
-55,Mt. Mortar,Lower Cave,cave
-56,Mt. Mortar,Upper Cave,cave
-81,Mt. Silver,1F top,grass
-80,Mt. Silver,1F,cave
-87,Mt. Silver,2F,cave
-89,Mt. Silver,3F,cave
-82,Mt. Silver,4F,cave
-88,Mt. Silver,mountainside,grass
-86,Mt. Silver,outside,grass
-90,Mt. Silver,top,grass
-24,National Park,,grass
-1,New Bark Town,,
-41,Olivine City,,
-102,Pallet Town,,
-109,Rock Tunnel,1F,cave
-110,Rock Tunnel,B1F,cave
-112,Route 1,,grass
-113,Route 2,,grass
-137,Route 2,something else,grass
-114,Route 3,,grass
-115,Route 4,,grass
-116,Route 5,,grass
-117,Route 6,,grass
-118,Route 7,,grass
-119,Route 8,,grass
-120,Route 9,,grass
-121,Route 10,,grass
-122,Route 11,,grass
-93,Route 12,,grass
-123,Route 13,,grass
-124,Route 14,,grass
-125,Route 15,,grass
-126,Route 16,,grass
-127,Route 17,,grass
-128,Route 18,,grass
-94,Route 19,,
-95,Route 20,,
-129,Route 21,,grass
-130,Route 22,,grass
-131,Route 24,,grass
-132,Route 25,,grass
-104,Route 26,,grass
-105,Route 27,,grass
-106,Route 28,,grass
-2,Route 29,,grass
-4,Route 30,,grass
-5,Route 31,,grass
-9,Route 32,,grass
-18,Route 33,,grass
-22,Route 34,,grass
-23,Route 35,,grass
-26,Route 36,,grass
-27,Route 37,,grass
-39,Route 38,,grass
-40,Route 39,,grass
-42,Route 40,,grass
-43,Route 41,,grass
-53,Route 42,,grass
-58,Route 43,,grass
-60,Route 44,,grass
-68,Route 45,,grass
-69,Route 46,,grass
-72,Route 47,,grass
-83,Route 47,cave gate,
-84,Route 47,inside cave,cave
-103,Route 48,,grass
-11,Ruins of Alph,Interior A,floor
-12,Ruins of Alph,Interior B,floor
-13,Ruins of Alph,Interior C,floor
-14,Ruins of Alph,Interior D,floor
-10,Ruins of Alph,Outside,grass
-75,Seafoam Islands,1F,cave
-76,Seafoam Islands,B1F,cave
-77,Seafoam Islands,B2F,cave
-78,Seafoam Islands,B3F,cave
-79,Seafoam Islands,B4F,cave
-19,Slowpoke Well,1F,cave
-20,Slowpoke Well,B1F,cave
-7,Sprout Tower,2F,floor
-8,Sprout Tower,3F,floor
-31,Tin Tower,2F,floor
-32,Tin Tower,3F,floor
-33,Tin Tower,4F,floor
-34,Tin Tower,5F,floor
-35,Tin Tower,6F,floor
-36,Tin Tower,7F,floor
-37,Tin Tower,8F,floor
-38,Tin Tower,9F,floor
-85,Tin Tower,10F,floor
-133,Tohjo Falls,,cave
-15,Union Cave,1F,cave
-16,Union Cave,B1F,cave
-17,Union Cave,B2F,cave
-139,Unknown 138,,
-50,Unknown 49,,
-51,Unknown 50,,
-65,Unknown 64,,
-91,Unknown 90,,
-140,Unknown Dungeon,1F,cave
-141,Unknown Dungeon,2F,cave
-142,Unknown Dungeon,B1F,cave
-74,Unknown; all Poliwag,,
-92,Unknown; all Rattata,,
-25,Unknown; all bugs,,
-99,Vermilion City,,
-111,Victory Road,,cave
-135,Victory Road,one,cave
-136,Victory Road,two,cave
-6,Violet City,,
-97,Viridian City,,
-138,Viridian Forest,,grass
-49,Whirl Islands,B3F,cave
-46,Whirl Islands,empty floor X,cave
-48,Whirl Islands,empty floor Y,cave
-44,Whirl Islands,unknown floors A,cave
-45,Whirl Islands,unknown floors B,cave
-47,Whirl Islands,unknown floors C,cave
+id,region,location,area,terrain
+66,johto,Blackthorn City,,
+29,johto,Burned Tower,1F,floor
+30,johto,Burned Tower,B1F,floor
+100,kanto,Celadon City,,
+98,kanto,Cerulean City,,
+3,johto,Cherrygrove City,,
+52,johto,Cianwood City,,
+96,kanto,Cinnabar Island,,
+71,johto,Dark Cave,Blackthorn City entrance,cave
+70,johto,Dark Cave,Violet City entrance,cave
+134,kanto,Diglett's Cave,,cave
+67,johto,Dragon's Den,,
+28,johto,Ecruteak City,,
+101,johto,Fuchsia City,,
+61,johto,Ice Cave,1F,cave
+62,johto,Ice Cave,B1F,cave
+63,johto,Ice Cave,B2F,cave
+64,johto,Ice Cave,B3F,cave
+21,johto,Ilex Forest,,grass
+59,johto,Lake of Rage,,
+107,kanto,Mt. Moon,1F,cave
+108,kanto,Mt. Moon,2F,cave
+73,kanto,Mt. Moon,outside,
+54,johto,Mt. Mortar,1F,cave
+57,johto,Mt. Mortar,B1F,cave
+55,johto,Mt. Mortar,Lower Cave,cave
+56,johto,Mt. Mortar,Upper Cave,cave
+81,johto,Mt. Silver,1F top,grass
+80,johto,Mt. Silver,1F,cave
+87,johto,Mt. Silver,2F,cave
+89,johto,Mt. Silver,3F,cave
+82,johto,Mt. Silver,4F,cave
+88,johto,Mt. Silver,mountainside,grass
+86,johto,Mt. Silver,outside,grass
+90,johto,Mt. Silver,top,grass
+24,johto,National Park,,grass
+1,johto,New Bark Town,,
+41,johto,Olivine City,,
+102,kanto,Pallet Town,,
+109,kanto,Rock Tunnel,1F,cave
+110,kanto,Rock Tunnel,B1F,cave
+112,kanto,Route 1,,grass
+113,kanto,Route 2,,grass
+137,kanto,Route 2,something else,grass
+114,kanto,Route 3,,grass
+115,kanto,Route 4,,grass
+116,kanto,Route 5,,grass
+117,kanto,Route 6,,grass
+118,kanto,Route 7,,grass
+119,kanto,Route 8,,grass
+120,kanto,Route 9,,grass
+121,kanto,Route 10,,grass
+122,kanto,Route 11,,grass
+93,kanto,Route 12,,grass
+123,kanto,Route 13,,grass
+124,kanto,Route 14,,grass
+125,kanto,Route 15,,grass
+126,kanto,Route 16,,grass
+127,kanto,Route 17,,grass
+128,kanto,Route 18,,grass
+94,kanto,Route 19,,
+95,kanto,Route 20,,
+129,kanto,Route 21,,grass
+130,kanto,Route 22,,grass
+131,kanto,Route 24,,grass
+132,kanto,Route 25,,grass
+104,kanto,Route 26,,grass
+105,kanto,Route 27,,grass
+106,kanto,Route 28,,grass
+2,johto,Route 29,,grass
+4,johto,Route 30,,grass
+5,johto,Route 31,,grass
+9,johto,Route 32,,grass
+18,johto,Route 33,,grass
+22,johto,Route 34,,grass
+23,johto,Route 35,,grass
+26,johto,Route 36,,grass
+27,johto,Route 37,,grass
+39,johto,Route 38,,grass
+40,johto,Route 39,,grass
+42,johto,Route 40,,grass
+43,johto,Route 41,,grass
+53,johto,Route 42,,grass
+58,johto,Route 43,,grass
+60,johto,Route 44,,grass
+68,johto,Route 45,,grass
+69,johto,Route 46,,grass
+72,johto,Route 47,,grass
+83,johto,Route 47,cave gate,
+84,johto,Route 47,inside cave,cave
+103,johto,Route 48,,grass
+11,johto,Ruins of Alph,Interior A,floor
+12,johto,Ruins of Alph,Interior B,floor
+13,johto,Ruins of Alph,Interior C,floor
+14,johto,Ruins of Alph,Interior D,floor
+10,johto,Ruins of Alph,Outside,grass
+75,kanto,Seafoam Islands,1F,cave
+76,kanto,Seafoam Islands,B1F,cave
+77,kanto,Seafoam Islands,B2F,cave
+78,kanto,Seafoam Islands,B3F,cave
+79,kanto,Seafoam Islands,B4F,cave
+19,johto,Slowpoke Well,1F,cave
+20,johto,Slowpoke Well,B1F,cave
+7,johto,Sprout Tower,2F,floor
+8,johto,Sprout Tower,3F,floor
+31,johto,Tin Tower,2F,floor
+32,johto,Tin Tower,3F,floor
+33,johto,Tin Tower,4F,floor
+34,johto,Tin Tower,5F,floor
+35,johto,Tin Tower,6F,floor
+36,johto,Tin Tower,7F,floor
+37,johto,Tin Tower,8F,floor
+38,johto,Tin Tower,9F,floor
+85,johto,Tin Tower,10F,floor
+133,johto,Tohjo Falls,,cave
+15,johto,Union Cave,1F,cave
+16,johto,Union Cave,B1F,cave
+17,johto,Union Cave,B2F,cave
+139,,Unknown 138,,
+50,,Unknown 49,,
+51,,Unknown 50,,
+65,,Unknown 64,,
+91,,Unknown 90,,
+140,kanto,Unknown Dungeon,1F,cave
+141,kanto,Unknown Dungeon,2F,cave
+142,kanto,Unknown Dungeon,B1F,cave
+74,,Unknown; all Poliwag,,
+92,,Unknown; all Rattata,,
+25,,Unknown; all bugs,,
+99,kanto,Vermilion City,,
+111,kanto,Victory Road,,cave
+135,kanto,Victory Road,one,cave
+136,kanto,Victory Road,two,cave
+6,johto,Violet City,,
+97,kanto,Viridian City,,
+138,kanto,Viridian Forest,,grass
+49,johto,Whirl Islands,B3F,cave
+46,johto,Whirl Islands,empty floor X,cave
+48,johto,Whirl Islands,empty floor Y,cave
+44,johto,Whirl Islands,unknown floors A,cave
+45,johto,Whirl Islands,unknown floors B,cave
+47,johto,Whirl Islands,unknown floors C,cave
