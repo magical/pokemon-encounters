@@ -1,0 +1,125 @@
+bank,num,location,area
+1,0,Viridian Forest,
+1,1,Mount Moon,1F
+1,2,Mount Moon,B1F
+1,3,Mount Moon,B2F
+1,4,S.S. Anne,
+1,37,DIGLETT's Cave,
+1,39,Victory Road,1F
+1,40,Victory Road,2F
+1,41,Victory Road,3F
+1,59,Pokémon Mansion,
+1,60,Pokémon Mansion,
+1,61,Pokémon Mansion,
+1,62,Pokémon Mansion,B1F
+1,63,Safari Zone,center
+1,64,Safari Zone,"right, area 1"
+1,65,Safari Zone,"top, area 2"
+1,66,Safari Zone,"left, area 3"
+1,72,Cerulean Cave,1F
+1,73,Cerulean Cave,2F
+1,74,Cerulean Cave,B1F
+1,81,Rock Tunnel,1F
+1,82,Rock Tunnel,B1F
+1,83,Seafoam Islands,1F
+1,84,Seafoam Islands,B1F
+1,85,Seafoam Islands,B2F
+1,86,Seafoam Islands,B3F
+1,87,Seafoam Islands,B4F
+1,90,Pokémon Tower,3F
+1,91,Pokémon Tower,4F
+1,92,Pokémon Tower,5F
+1,93,Pokémon Tower,6F
+1,94,Pokémon Tower,7F
+1,95,Power Plant,
+1,97,Mt. Ember,
+1,98,Mt. Ember,cave
+1,99,Mt. Ember,inside
+1,100,Mt. Ember,cave
+1,103,Mt. Ember,"1F, cave behind team rocket"
+1,104,Mt. Ember,B1F
+1,105,Mt. Ember,B2F
+1,106,Mt. Ember,B3F
+1,107,Mt. Ember,B2F
+1,108,Mt. Ember,B1F
+1,109,Berry Forest,
+1,110,Icefall Cave,entrance
+1,111,Icefall Cave,1F
+1,112,Icefall Cave,B1F
+1,113,Icefall Cave,waterfall
+1,121,Patern Bush,
+1,122,Altering Cave,
+2,13,Lost Cave,room 1
+2,14,Lost Cave,room 2
+2,15,Lost Cave,room 3
+2,16,Lost Cave,room 4
+2,17,Lost Cave,room 5
+2,18,Lost Cave,room 6
+2,19,Lost Cave,room 7
+2,20,Lost Cave,room 8
+2,21,Lost Cave,room 9
+2,22,Lost Cave,room 10
+2,23,Lost Cave,item rooms
+2,24,Lost Cave,item rooms
+2,25,Lost Cave,item rooms
+2,26,Lost Cave,item rooms
+2,27,Monean Chamber,
+2,28,Liptoo Chamber,
+2,29,Weepth Chamber,
+2,30,Dilford Chamber,
+2,31,Scufib Chamber,
+2,32,Rixy Chamber,
+2,33,Viapos Chamber,
+3,0,Pallet Town,
+3,1,Viridian City,
+3,3,Cerulean City,
+3,5,Vermillion City,
+3,6,Celadon City,
+3,7,Fuchsia City,
+3,8,Cinnabar Island,
+3,12,One Island,
+3,15,Four Island,
+3,16,Five Island,
+3,19,Route 1,
+3,20,Route 2,
+3,21,Route 3,
+3,22,Route 4,
+3,23,Route 5,
+3,24,Route 6,
+3,25,Route 7,
+3,26,Route 8,
+3,27,Route 9,
+3,28,Route 10,
+3,29,Route 11,
+3,30,Route 12,
+3,31,Route 13,
+3,32,Route 14,
+3,33,Route 15,
+3,34,Route 16,
+3,35,Route 17,
+3,36,Route 18,
+3,37,Route 19,
+3,38,Route 20,
+3,39,Route 21,
+3,40,Route 21,
+3,41,Route 22,
+3,42,Route 23,
+3,43,Route 24,
+3,44,Route 25,
+3,45,Kindle Road,
+3,46,Treasure Beach,
+3,47,Cape Brink,
+3,48,Bond Bridge,
+3,49,Three Isle Port,
+3,54,Resort Gorgeous,
+3,55,Water Labyrinth,
+3,56,Five Isle Meadow,
+3,57,Memorial Pillar,
+3,58,Outcast Island,
+3,59,Green Path,
+3,60,Water Path,
+3,61,Ruin Valley,
+3,62,Trainer Tower,
+3,63,Canyon Entrance,
+3,64,Sevault Canyon,
+3,65,Tanoby Ruins,

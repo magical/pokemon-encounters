@@ -1,0 +1,117 @@
+bank,num,location,area
+0,0,Petalburg City,
+0,1,Slateport City,
+0,5,Lilycove City,
+0,6,Mossdeep City,
+0,7,Sootopolis City,
+0,8,Ever Grande City,
+0,11,Dewford Town,
+0,15,Pacifidlog Town,
+0,16,Route 101,
+0,17,Route 102,
+0,18,Route 103,
+0,19,Route 104,
+0,20,Route 105,
+0,21,Route 106,
+0,22,Route 107,
+0,23,Route 108,
+0,24,Route 109,
+0,25,Route 110,
+0,26,Route 111,
+0,27,Route 112,
+0,28,Route 113,
+0,29,Route 114,
+0,30,Route 115,
+0,31,Route 116,
+0,32,Route 117,
+0,33,Route 118,
+0,34,Route 119,
+0,35,Route 120,
+0,36,Route 121,
+0,37,Route 122,
+0,38,Route 123,
+0,39,Route 124,
+0,40,Route 125,
+0,41,Route 126,
+0,42,Route 127,
+0,43,Route 128,
+0,44,Route 129,
+0,45,Route 130,
+0,46,Route 131,
+0,47,Route 132,
+0,48,Route 133,
+0,49,Route 134,
+0,50,Route 124,underwater
+0,51,Route 126,underwater
+24,0,Meteor Falls,
+24,1,Meteor Falls,back
+24,2,Meteor Falls,B1F
+24,3,Meteor Falls,back/small room
+24,4,Rusturf Tunnel,
+24,7,Granite Cave,1F
+24,8,Granite Cave,B1F
+24,9,Granite Cave,B2F
+24,10,Granite Cave,1F/small Room
+24,11,Petalburg Woods,
+24,13,Jagged Pass,
+24,14,Fiery Pass,
+24,15,Mt. Pyre,1F
+24,16,Mt. Pyre,2F
+24,17,Mt. Pyre,3F
+24,18,Mt. Pyre,4F
+24,19,Mt. Pyre,5F
+24,20,Mt. Pyre,6F
+24,21,Mt. Pyre,outside
+24,22,Mt. Pyre,summit
+24,27,Seafloor Cavern,
+24,28,Seafloor Cavern,
+24,29,Seafloor Cavern,
+24,30,Seafloor Cavern,
+24,31,Seafloor Cavern,
+24,32,Seafloor Cavern,
+24,33,Seafloor Cavern,
+24,34,Seafloor Cavern,
+24,35,Seafloor Cavern,
+24,37,Cave of Origin,entrance
+24,38,Cave of Origin,1F
+24,39,Cave of Origin,B1F
+24,40,Cave of Origin,B2F
+24,41,Cave of Origin,B3F
+24,43,Victory Road,1F
+24,44,Victory Road,B1F
+24,45,Victory Road,B2F
+24,46,Shoal Cave,
+24,47,Shoal Cave,
+24,48,Shoal Cave,
+24,49,Shoal Cave,
+24,52,New Mauville,Entrance
+24,53,New Mauville,
+24,58,Abondoned Ship,
+24,65,Abondoned Ship,
+24,79,Sky Pillar,1F
+24,81,Sky Pillar,3F
+24,83,Shoal Cave,B1F
+24,84,Sky Pillar,5F
+24,86,Magma Hideout,
+24,87,Magma Hideout,
+24,88,Magma Hideout,
+24,89,Magma Hideout,
+24,90,Magma Hideout,
+24,91,Magma Hideout,
+24,92,Magma Hideout,
+24,93,Magma Hideout,
+24,94,Mirage Tower,
+24,95,Mirage Tower,
+24,96,Mirage Tower,
+24,97,Mirage Tower,
+24,98,Desert Underpass,
+24,99,Artisan Cave,
+24,100,Artisan Cave,
+24,106,Altering Cave,
+24,107,Meteor Falls,
+26,0,Safari Zone,NW/mach bike area
+26,1,Safari Zone,NE/acro bike area
+26,2,Safari Zone,SW
+26,3,Safari Zone,SE
+26,12,Safari Zone,expansion north
+26,13,Safari Zone,expansion south
