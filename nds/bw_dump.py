@@ -1,14 +1,29 @@
 from cStringIO import StringIO
 from struct import pack, unpack
+from lxml.etree import ElementTree, Element, SubElement
+from collections import defaultdict
 
 from .narc import parse_narc
 
 
-seasons = ('spring', 'summer', 'autumn', 'winter')
+SEASONS = ('spring', 'summer', 'autumn', 'winter')
+FORMS = {
+    550: ('red-stripe', 'blue-stripe'),
+    585: SEASONS,
+    586: SEASONS,
+}
+
 
 def chunkit(seq, n):
     for i in range(0, len(seq), n):
         yield seq[i:i+n]
+
+def _unpack_entry(entry):
+    pokemon, min_level, max_level = unpack("<HBB", entry)
+    return pokemon, (min_level, max_level)
+
+def _readencounters(f, n):
+    return map(_unpack_entry, chunkit(f.read(4*n), 4))
 
 
 def dump_csv(narc_file, csv_writer):
@@ -16,8 +31,8 @@ def dump_csv(narc_file, csv_writer):
     writerow = csv_writer.writerow
 
     for i, record in enumerate(records):
-        if 292 < len(record):
-            for season, subrecord in zip(seasons, chunkit(record, 292)):
+        if 232 < len(record):
+            for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 _dump_record(writerow, i, season, record)
         else:
             _dump_record(writerow, i, None, record)
@@ -40,7 +55,7 @@ def dump_text(narc_file, out):
     for i, record in enumerate(records):
         write("Location", i)
         if len(record) > 232:
-            for season, subrecord in zip(seasons, chunkit(record, 232)):
+            for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 write(" {}:".format(season.capitalize()))
                 _dumpencounter(write, subrecord)
         else:
@@ -56,7 +71,7 @@ def _dumpencounter(write, chunk):
     chunk = StringIO(chunk)
 
     def readencounters(n):
-        return [unpack("<HBB", x) for x in chunkit(chunk.read(4*n), 4)]
+        return _readencounters(chunk, n)
 
     def writeencounters(prefix, list, predicate, kidding=False):
         if not predicate or kidding:
@@ -66,7 +81,7 @@ def _dumpencounter(write, chunk):
 
         write(prefix, end=" ")
         text = []
-        for pok, minl, maxl in list:
+        for pok, levels in list:
             form = pok >> 11
             pok = pok & 0x07ff
             name = "#" + str(pok)
@@ -74,7 +89,7 @@ def _dumpencounter(write, chunk):
                 name += " " + names[pok]
             except IndexError:
                 pass
-            text.append("Lv.%s %s" % (fmtrange(minl, maxl), name))
+            text.append("Lv.%s %s" % (fmtrange(*levels), name))
             if form or pok in (550, 585, 586):
                 text[-1] += " Form#%s" % form
             else:
@@ -107,6 +122,99 @@ def _dumpencounter(write, chunk):
     write()
 
 
+#####
+
+def dump_xml(narc_file, out):
+    load_names()
+    xml = to_xml(narc_file)
+    out.write("""<?xml version="1.0" encoding="utf-8"?>\n""")
+    xml.write(out, pretty_print=True)
+
+def to_xml(narc_file):
+    root = Element('wild')
+    game = SubElement(root, 'game', version='')
+
+    def unpack_entry(entry):
+        pokemon, min_level, max_level = unpack("<HBB", entry)
+        return pokemon, (min_level, max_level)
+
+    def readencounters(n):
+        return map(unpack_entry, chunkit(chunk.read(4*n), 4))
+
+    class Locations(defaultdict):
+        def __missing__(self, key):
+            self[key] = value = SubElement(game, 'location', name=key)
+            return value
+    locations = Locations()
+    areas = {}
+
+    records = parse_narc(narc_file)
+
+    for location_id, record in enumerate(records):
+        location_name, area_name = get_location_name(location_id)
+
+        location = locations[location_name]
+        area = SubElement(location, 'area', name=area_name,
+                                            internal_id=str(location_id))
+
+        if 232 <= len(record):
+            for season, subrecord in zip(SEASONS, chunkit(record, 232)):
+                _dump_xml_record(area, subrecord, season)
+        else:
+            _dump_xml_record(area, record)
+
+    return ElementTree(root)
+
+def _dump_xml_record(parent, record, season=None):
+    record = StringIO(record)
+
+    rates = map(ord, record.read(8))
+    encounter_type = rates.pop()
+
+    grass = _readencounters(record, 12)
+    doubles = _readencounters(record, 12)
+    grass_special = _readencounters(record, 12)
+
+    water = _readencounters(record, 5)
+    water_special = _readencounters(record, 5)
+
+    fishing = _readencounters(record, 5)
+    fishing_special = _readencounters(record, 5)
+
+    def something(method, encounters, rate):
+        if not rate:
+            return
+        monsters = SubElement(parent, 'monsters',
+            method=method,
+            rate=str(rate)
+        )
+        if season:
+            monsters.set('season', season)
+        for slot, (poke, levels) in enumerate(encounters):
+            poke, form_index = poke & 0x7ff, poke >> 11
+            e = SubElement(monsters, 'pokemon',
+                national_id=str(poke),
+                levels=fmtrange(*levels),
+                name=names[poke],
+                slot=str(slot),
+            )
+            if poke in FORMS:
+                form = FORMS[poke][form_index]
+                e.set('form', str(form))
+            else:
+                assert form_index == 0, (poke, form_index)
+
+    something('grass', grass, rates[0])
+    something('doubles_grass', doubles, rates[1])
+    something('grass_special', grass_special, rates[2])
+
+    something('water', water, rates[3])
+    something('water_special', water_special, rates[4])
+
+    something('fishing', fishing, rates[5])
+    something('fishing_special', fishing_special, rates[6])
+
+
 names = None
 def load_names():
     global names
@@ -114,3 +222,6 @@ def load_names():
         import os.path
         namefile = os.path.join(os.path.dirname(__file__), "../names.txt")
         names = open(namefile).read().splitlines()
+
+def get_location_name(location_id):
+    return "BW Unknown", "Unknown Area {}".format(location_id)
