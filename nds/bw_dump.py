@@ -90,7 +90,7 @@ def _dumpencounter(write, chunk):
             except IndexError:
                 pass
             text.append("Lv.%s %s" % (fmtrange(*levels), name))
-            if form or pok in (550, 585, 586):
+            if pok in (550, 585, 586):
                 text[-1] += " Form#%s" % form
             else:
                 assert form == 0
@@ -126,7 +126,10 @@ def _dumpencounter(write, chunk):
 
 def dump_xml(narc_file, out):
     load_names()
+    load_locations()
+
     xml = to_xml(narc_file)
+    #XXX is it really utf-8?
     out.write("""<?xml version="1.0" encoding="utf-8"?>\n""")
     xml.write(out, pretty_print=True)
 
@@ -157,7 +160,7 @@ def to_xml(narc_file):
         area = SubElement(location, 'area', name=area_name,
                                             internal_id=str(location_id))
 
-        if 232 <= len(record):
+        if 232 < len(record):
             for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 _dump_xml_record(area, subrecord, season)
         else:
@@ -181,7 +184,7 @@ def _dump_xml_record(parent, record, season=None):
     fishing = _readencounters(record, 5)
     fishing_special = _readencounters(record, 5)
 
-    def something(method, encounters, rate):
+    def something(method, terrain, spots, encounters, rate):
         if not rate:
             return
         monsters = SubElement(parent, 'monsters',
@@ -190,6 +193,10 @@ def _dump_xml_record(parent, record, season=None):
         )
         if season:
             monsters.set('season', season)
+        if terrain:
+            monsters.set('terrain', terrain)
+        if spots:
+            monsters.set('spots', 'spots')
         for slot, (poke, levels) in enumerate(encounters):
             poke, form_index = poke & 0x7ff, poke >> 11
             e = SubElement(monsters, 'pokemon',
@@ -204,15 +211,24 @@ def _dump_xml_record(parent, record, season=None):
             else:
                 assert form_index == 0, (poke, form_index)
 
-    something('grass', grass, rates[0])
-    something('doubles_grass', doubles, rates[1])
-    something('grass_special', grass_special, rates[2])
+    assert not (rates[1] and encounter_type != 0), (
+        "doubles grass in non-grass area")
 
-    something('water', water, rates[3])
-    something('water_special', water_special, rates[4])
+    walk_terrain = 'grass'
+    if encounter_type == 1:
+        walk_terrain = 'cave'
+    elif encounter_type == 2:
+        walk_terrain = 'bridge'
 
-    something('fishing', fishing, rates[5])
-    something('fishing_special', fishing_special, rates[6])
+    something('walk', walk_terrain, '',      grass,         rates[0])
+    something('walk', walk_terrain, 'spots', grass_special, rates[2])
+    something('walk', 'dark-grass', '',      doubles,       rates[1])
+
+    something('surf', '', '',      water,         rates[3])
+    something('surf', '', 'spots', water_special, rates[4])
+
+    something('fish', '', '',      fishing,         rates[5])
+    something('fish', '', 'spots', fishing_special, rates[6])
 
 
 names = None
@@ -223,5 +239,19 @@ def load_names():
         namefile = os.path.join(os.path.dirname(__file__), "../names.txt")
         names = open(namefile).read().splitlines()
 
+locations = None
+def load_locations():
+    global locations
+    if locations is None:
+        import os.path, csv
+        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations.csv")
+        f = open(locfile).read().splitlines()
+        locations = {}
+        for row in csv.DictReader(f):
+            locations[int(row['id'])] = row['location'], row['area']
+
 def get_location_name(location_id):
-    return "BW Unknown", "Unknown Area {}".format(location_id)
+    if location_id in locations:
+        return locations[location_id]
+    else:
+        return "BW Unknown", "Unknown Area {}".format(location_id)
