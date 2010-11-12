@@ -1,0 +1,63 @@
+# RelaxNG schema for wild pokemon data
+start = wild
+
+wild = element wild {
+    element game {
+        attribute version { version },
+        attribute language { langcode },
+
+        element location {
+            attribute name { text },
+            element area {
+                attribute name { text },
+                attribute internal_id { integer }?,
+
+                monsters*
+            }*
+        }*
+    }*
+}
+
+monsters = element monsters {
+    attribute method { method },
+    attribute terrain { terrain }?,
+    attribute rate { integer }?,
+    conditions,
+
+    ( monsters+ | pokemon+ )
+}
+
+pokemon = element pokemon {
+    attribute national_id { integer },
+    attribute levels { range },
+
+    attribute name { text }?,
+    attribute form { text }?,
+    attribute slot { integer }?
+}
+
+conditions = (
+    attribute season { "spring" | "summer" | "autumn" | "winter" }?,
+    attribute time { "morning" | "day" | "night" }?,
+    attribute spots { "spots" }?,
+    ( attribute swarm { "swarm" }
+    | attribute radar { "radar" }
+    | attribute slot2 { "ruby" | "sapphire" | "emerald" | "firered" | "leafgreen" }
+    | attribute radio { "hoenn" | "sinnoh" }
+    )?
+)
+
+version = ( "red" | "blue" | "yellow"
+          | "gold" | "silver" | "crystal"
+          | "ruby" | "sapphire" | "emerald" | "firered" | "leafgreen"
+          | "diamond" | "pearl" | "platinum" | "heartgold" | "soulsilver"
+          | "black" | "white"
+          )
+
+method = text
+terrain = text
+
+langcode = text
+integer = xsd:integer
+range = text
+
