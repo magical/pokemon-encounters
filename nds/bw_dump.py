@@ -135,7 +135,7 @@ def dump_xml(narc_file, out):
 
 def to_xml(narc_file):
     root = Element('wild')
-    game = SubElement(root, 'game', version='')
+    game = SubElement(root, 'game', version='black') # XXX
 
     def unpack_entry(entry):
         pokemon, min_level, max_level = unpack("<HBB", entry)
@@ -162,13 +162,16 @@ def to_xml(narc_file):
 
         if 232 < len(record):
             for season, subrecord in zip(SEASONS, chunkit(record, 232)):
-                _dump_xml_record(area, subrecord, season)
+                m = Element('monsters', season=season)
+                _dump_xml_record(m, subrecord)
+                if len(m):
+                    area.append(m)
         else:
             _dump_xml_record(area, record)
 
     return ElementTree(root)
 
-def _dump_xml_record(parent, record, season=None):
+def _dump_xml_record(parent, record):
     record = StringIO(record)
 
     rates = map(ord, record.read(8))
@@ -191,8 +194,6 @@ def _dump_xml_record(parent, record, season=None):
             method=method,
             rate=str(rate)
         )
-        if season:
-            monsters.set('season', season)
         if terrain:
             monsters.set('terrain', terrain)
         if spots:
@@ -200,10 +201,10 @@ def _dump_xml_record(parent, record, season=None):
         for slot, (poke, levels) in enumerate(encounters):
             poke, form_index = poke & 0x7ff, poke >> 11
             e = SubElement(monsters, 'pokemon',
-                national_id=str(poke),
+                number=str(poke),
                 levels=fmtrange(*levels),
                 name=names[poke],
-                slot=str(slot),
+                #slot=str(slot),
             )
             if poke in FORMS:
                 form = FORMS[poke][form_index]

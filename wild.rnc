@@ -19,7 +19,7 @@ wild = element wild {
 }
 
 monsters = element monsters {
-    attribute method { method },
+    attribute method { method }?,
     attribute terrain { terrain }?,
     attribute rate { integer }?,
     conditions,
@@ -28,7 +28,8 @@ monsters = element monsters {
 }
 
 pokemon = element pokemon {
-    attribute national_id { integer },
+    ## This must be the national id of the pokemon
+    attribute number { integer },
     attribute levels { range },
 
     attribute name { text }?,

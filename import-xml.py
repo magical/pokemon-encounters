@@ -76,29 +76,48 @@ def groupby(it, key):
 def identical(it, key=lambda x: x):
     return len(set(map(key, it))) == 1
 
+def visit_monsters(elem):
+    assert elem.tag == 'monsters'
+
+    obj = {}
+    if 'method' in elem.attrib:
+        obj['method'] = elem.get('method')
+    if 'terrain' in elem.attrib:
+        obj['terrain'] = elem.get('terrain')
+    if 'rate' in elem.attrib:
+        obj['rate'] = int(elem.get('rate'))
+
+    obj['conditions'] = lift_conditions(elem)
+
+    obj['pokemon'] = pokemon_list = []
+    for slot, pokemon in enumerate(elem.xpath('./pokemon')):
+        pokemon_list.append(visit_pokemon(pokemon, slot+1))
+
+    obj['subgroups'] = subgroups = []
+    for monsters in elem.xpath('./monsters'):
+        subgroups.append(visit_monsters(monsters))
+
+    return obj
+
+def visit_pokemon(elem, slot=None):
+    assert elem.tag == 'pokemon'
+
+    if elem.get('slot') is not None:
+        slot = int(elem.get('slot'))
+
+    obj = {
+        'slot': slot,
+        'pokemon_id': int(elem.get('number')),
+        'form': elem.get('form'),
+        'levels': parse_range(elem.get('levels')),
+    }
+    return obj
+
 def lift(root):
     """Lift encounter xml into json objects"""
     encounter_list = []
     for monsters in root:
-        encounters = {
-            'method': monsters.get('method'),
-            'terrain': monsters.get('terrain'),
-            #'season': monsters.get('season'),
-            #'spots': monsters.get('spots'),
-            'rate': int(monsters.get('rate')),
-        }
-        encounters['conditions'] = lift_conditions(monsters)
-        encounters['pokemon'] = pokemon_list = []
-        for pokemon in monsters:
-            obj = {
-                'slot': int(pokemon.get('slot')),
-                'pokemon_id': int(pokemon.get('national_id')),
-                'form': pokemon.get('form'),
-                'levels': parse_range(pokemon.get('levels')),
-                'conditions': {},
-            }
-            pokemon_list.append(obj)
-        encounter_list.append(encounters)
+        encounter_list.append(visit_monsters(monsters))
     return encounter_list
 
 class EncounterMonkey(object):
@@ -234,11 +253,9 @@ def reduce_encounters(root):
     # 5. For each set of condition values, the encounter data for the slot is
     #    computed under those conditions.
     # 6. Said data is added to the database.
-    encounters_list = lift(root)
+    encounters_list = flatten_encounters(lift(root))
     for method, group in groupby(encounters_list, itemgetter('method')):
         for terrain, group in groupby(group, itemgetter('terrain')):
-            group = flatten_encounters(group)
-
             for slot, encounters in groupby(group, itemgetter('slot')):
                 encounters = list(encounters)
                 #for e in encounters:
@@ -250,7 +267,7 @@ def reduce_encounters(root):
                     [[(cond, value) for value in get_condition_values(cond)]
                      for cond in monkey.get_conditions()]
 
-                #print(monkey.encounters)
+                print(method, terrain, slot, monkey.encounters)
 
                 for condition_set in itertools.product(*condition_values):
                     condition_set = dict(condition_set)
@@ -266,16 +283,31 @@ def reduce_encounters(root):
 def flatten_encounters(encountergroups):
     flattened = []
     for group in encountergroups:
-        for encounter in group['pokemon']:
-            #for k,v in group['conditions'].iteritems():
-            #    if k not in encounter['conditions']:
-            #        encounter['conditions'][k] = v
-            encounter['conditions'] = group['conditions'].copy()
-
-            encounter['method'] = group['method']
-            encounter['terrain'] = group['terrain']
-            flattened.append(encounter)
+        context = {'conditions': {}}
+        flattened.extend(_flatten(context, group))
     return flattened
+
+def _flatten(context, group):
+    context = context.copy()
+    for key in ('method', 'terrain', 'rate'):
+        if key in group:
+            context[key] = group[key]
+
+    if group['conditions']:
+        c = context['conditions'].copy()
+        c.update(group['conditions'])
+        context['conditions'] = c
+
+    for p in group['pokemon']:
+        p['conditions'] = context['conditions'].copy()
+        p['method'] = context['method']
+        p['terrain'] = context.get('terrain')
+
+        yield p
+
+    for g in group['subgroups']:
+        for p in _flatten(context, g):
+            yield p
 
 def add_encounter(session, context, xml_encounter):
     ctx = context
