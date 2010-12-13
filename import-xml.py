@@ -10,8 +10,10 @@ from lxml.etree import parse as parse_xml
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 
 from db import Encounter, EncounterCondition, EncounterConditionValue
+from db import EncounterMethod, EncounterTerrain, EncounterSlot
 from db import Location, LocationArea
 from db import Version
 
@@ -267,7 +269,7 @@ def reduce_encounters(root):
                     [[(cond, value) for value in get_condition_values(cond)]
                      for cond in monkey.get_conditions()]
 
-                print(method, terrain, slot, monkey.encounters)
+                #print(method, terrain, slot, monkey.encounters)
 
                 for condition_set in itertools.product(*condition_values):
                     condition_set = dict(condition_set)
@@ -277,8 +279,8 @@ def reduce_encounters(root):
                         e = e.copy()
                         e['conditions'] = condition_set
                         yield e
-                    else:
-                        print (condition_set)
+                    #else:
+                    #    print (condition_set)
 
 def flatten_encounters(encountergroups):
     flattened = []
@@ -309,23 +311,98 @@ def _flatten(context, group):
         for p in _flatten(context, g):
             yield p
 
-def add_encounter(session, context, xml_encounter):
-    ctx = context
+def insert_encounters(session, ctx, encounters):
+    for e in encounters:
+        encounter = make_encounter(e, ctx)
+        session.add(encounter)
+    session.flush()
 
-    a = xml_encounter.attrib
-    slot = int(a['slot'])
+def make_encounter(obj, ctx):
+    """Make an db.Encounter object from a dict"""
+
+    #XXX not very efficient
+    def get_terrain_id(terrain):
+        return session.query(EncounterTerrain.id).filter_by(identifier=terrain).one()[0]
+    def get_method_id(method):
+        return session.query(EncounterMethod.id).filter_by(identifier=method).one()[0]
+    def get_or_create_encounter_slot(slot, method_id, version_group_id,
+                                     terrain_id=None):
+        q = session.query(EncounterSlot).filter_by(
+            slot=slot,
+            version_group_id=version_group_id,
+            encounter_method_id=method_id,
+            encounter_terrain_id=terrain_id,
+        )
+        try:
+            x = q.one()
+        except NoResultFound:
+            x = EncounterSlot()
+            x.slot=slot
+            x.version_group_id=version_group_id
+            x.encounter_method_id=method_id
+            x.encounter_terrain_id=terrain_id
+        return x
 
     e = Encounter()
-    e.pokemon_id = int(a['pokemon_id'])
-    #e.form_id = int(a['form_id'])
-    e.slot = int(a['slot'])
-    e.version_id = ctx['version_id']
-    e.terrain_id = ctx['terrain_id']
-    e.method_id = ctx['method_id']
 
-    #encounter_add_condition(e, )
+    # Pokemon
+    e.pokemon_id = obj['pokemon_id']
+    #e.form_id = int(obj['form_id'])
 
-    session.add(e)
+    e.version_id = ctx['version'].id
+
+    if obj['terrain'] is not None:
+        terrain_id = get_terrain_id(obj['terrain'])
+    else:
+        terrain_id = None
+    method_id = get_method_id(obj['method'])
+
+    e.slot = get_or_create_encounter_slot(
+        slot = obj['slot'],
+        version_group_id = ctx['version'].version_group_id,
+        method_id = method_id,
+        terrain_id = terrain_id,
+    )
+
+    e.location_area = ctx['area']
+
+    # Add levels
+    if len(obj['levels']) == 1:
+        e.min_level = e.max_level = obj['levels'][0]
+    elif len(obj['levels']) == 2:
+        e.min_level, e.max_level = obj['levels']
+    else:
+        raise ValueError(obj['levels'])
+
+    # Add conditions
+    for cond, value in obj['conditions'].iteritems():
+        c = get_condition(cond, value)
+        e.condition_values.append(c)
+    return e
+
+def get_or_create_location(session, loc_elem, ctx):
+    q = session.query(Location).filter_by(
+        name=loc_elem.get('name'),
+        region_id=ctx['region'].id,
+    )
+    try:
+        loc = q.one()
+    except NoResultFound:
+        loc = Location()
+        loc.name = loc_elem.get('name')
+        loc.region = ctx['region']
+        session.add(loc)
+    return loc
+
+def create_area(session, area_elem, ctx):
+    area = LocationArea()
+    area.name = area_elem.get('name')
+    area.internal_id = int(area_elem.get('internal_id'))
+    area.location = ctx['location']
+    session.add(area)
+    return area
+
+
 
 def main():
     engine = create_engine('sqlite:///test.sqlite')
@@ -340,24 +417,28 @@ def main():
         # unicode strings in the tree.
         xml = parse_xml(f)
 
+    ctx = {}
     for game in xml.xpath('/wild/game'):
-        version = get_version(game.get('version'))
-        version_group_id = version.version_group_id
-        generation_id = version.version_group.generation_id
+        ctx['version'] = get_version(game.get('version'))
+        # XXX
+        ctx['region'] = ctx['version'].version_group.generation.main_region
         for loc in game.xpath('location'):
-            #create_location(loc.get('name'))
+            ctx['location'] = get_or_create_location(session, loc, ctx)
             for area in loc.xpath('area'):
-                context = {
-                    "loc": loc.get('name'),
-                    "area": area.get('name'),
-                }
+                ctx['area'] = create_area(session, area, ctx)
 
-                print context
+                if area.get('name', ''):
+                    print loc.get('name') + "/" + area.get('name')
+                else:
+                    print loc.get('name')
+
                 encounters = reduce_encounters(area)
-                for e in sorted(encounters, key=itemgetter('method', 'terrain')):
-                    print e
+                insert_encounters(session, ctx, encounters)
+                #for e in sorted(encounters,
+                #                key=itemgetter('method', 'terrain')):
+                #    print e
+    session.commit()
 
-                #print list(encounters)
 
 if __name__ == '__main__':
     import time

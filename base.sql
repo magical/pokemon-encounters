@@ -98,13 +98,13 @@ CREATE TABLE location_areas (
 DROP TABLE IF EXISTS location_area_encounter_rates;
 CREATE TABLE location_area_encounter_rates (
     location_area_id INTEGER NOT NULL, 
-    encounter_terrain_id INTEGER NOT NULL, 
+    encounter_method_id INTEGER NOT NULL, 
     version_id INTEGER NOT NULL, 
     rate INTEGER, 
-    PRIMARY KEY (location_area_id, encounter_terrain_id, version_id), 
+    PRIMARY KEY (location_area_id, encounter_method_id, version_id), 
     FOREIGN KEY(location_area_id) REFERENCES location_areas (id), 
     FOREIGN KEY(version_id) REFERENCES versions (id), 
-    FOREIGN KEY(encounter_terrain_id) REFERENCES encounter_terrain (id)
+    FOREIGN KEY(encounter_method_id) REFERENCES encounter_methods (id)
 );
 
 
@@ -161,12 +161,14 @@ DROP TABLE IF EXISTS encounter_slots;
 CREATE TABLE encounter_slots (
 	id INTEGER NOT NULL, 
 	version_group_id INTEGER NOT NULL, 
-	encounter_terrain_id INTEGER NOT NULL, 
+	encounter_method_id INTEGER NOT NULL, 
+	encounter_terrain_id INTEGER, 
 	slot INTEGER, 
 	rarity INTEGER, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(version_group_id) REFERENCES version_groups (id), 
-	FOREIGN KEY(encounter_terrain_id) REFERENCES encounter_terrain (id)
+	FOREIGN KEY(encounter_method_id) REFERENCES encounter_methods (id)
+	FOREIGN KEY(encounter_terrain_id) REFERENCES encounter_terrains (id)
 );
 
 DROP TABLE IF EXISTS encounters;
@@ -208,6 +210,7 @@ INSERT INTO "encounter_methods" VALUES(4,'super-rod','Fishing with a Super Rod')
 INSERT INTO "encounter_methods" VALUES(5,'surf','Surfing');
 INSERT INTO "encounter_methods" VALUES(6,'rock-smash','Smashing rocks');
 INSERT INTO "encounter_methods" VALUES(7,'headbutt','Headbutting trees');
+INSERT INTO "encounter_methods" VALUES(8,'fish','Fishing in BW');
 
 DROP TABLE IF EXISTS encounter_terrains;
 CREATE TABLE encounter_terrains (
@@ -216,8 +219,9 @@ CREATE TABLE encounter_terrains (
 	PRIMARY KEY (id)
 );
 INSERT INTO "encounter_terrains" VALUES(1,'grass');
-INSERT INTO "encounter_terrains" VALUES(2,'cave');
-INSERT INTO "encounter_terrains" VALUES(3,'bridge');
+INSERT INTO "encounter_terrains" VALUES(2,'dark-grass');
+INSERT INTO "encounter_terrains" VALUES(3,'cave');
+INSERT INTO "encounter_terrains" VALUES(4,'bridge');
 
 DROP TABLE IF EXISTS pokemon;
 CREATE TABLE pokemon (
