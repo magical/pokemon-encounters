@@ -1,4 +1,9 @@
 # RelaxNG schema for wild pokemon data
+#
+# The schema is based on the output from meowth346's script (wild.gbc/wild.rb).
+# Element and attribute names are mostly the same; this schema departs from
+# that one only where i have a specific reason to do so.
+
 start = wild
 
 wild = element wild {
