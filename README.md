@@ -42,3 +42,4 @@ ROM
    structure of the database. For Veekun's database, this means a ton
    of normalization.
 
+[porigon-z]: http://bugs.veekun.com/projects/porigon-z
