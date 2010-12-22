@@ -19,12 +19,10 @@ from db import Version
 
 SessionClass = sessionmaker()
 
-# globals! oh noes!
-session = SessionClass()
 
 _conditions = {}
 _condition_values = {}
-def load_conditions():
+def load_conditions(session):
     q = (session.query(EncounterConditionValue,
                        EncounterCondition.identifier)
             .join(EncounterCondition)
@@ -43,7 +41,7 @@ def get_condition_values(cond):
     return _condition_values[unicode(cond)]
 
 _versions = {}
-def load_versions():
+def load_versions(session):
     q = session.query(Version)
     for version in q.all():
         _versions[version.name.lower()] = version
@@ -313,11 +311,11 @@ def _flatten(context, group):
 
 def insert_encounters(session, ctx, encounters):
     for e in encounters:
-        encounter = make_encounter(e, ctx)
+        encounter = make_encounter(session, e, ctx)
         session.add(encounter)
     session.flush()
 
-def make_encounter(obj, ctx):
+def make_encounter(session, obj, ctx):
     """Make an db.Encounter object from a dict"""
 
     #XXX not very efficient
@@ -381,41 +379,45 @@ def make_encounter(obj, ctx):
     return e
 
 def get_or_create_location(session, loc_elem, ctx):
+    name = unicode(loc_elem.get('name'))
     q = session.query(Location).filter_by(
-        name=loc_elem.get('name'),
+        name=name,
         region_id=ctx['region'].id,
     )
     try:
         loc = q.one()
     except NoResultFound:
         loc = Location()
-        loc.name = loc_elem.get('name')
+        loc.name = name
         loc.region = ctx['region']
-        session.add(loc)
+        #session.add(loc)
     return loc
 
 def create_area(session, area_elem, ctx):
+    name = area_elem.get('name')
+    if name is not None:
+        name = unicode(name)
+
     area = LocationArea()
-    area.name = area_elem.get('name')
+    area.name = name
     area.internal_id = int(area_elem.get('internal_id'))
     area.location = ctx['location']
-    session.add(area)
+    #session.add(area)
     return area
 
 
 
 def main():
     engine = create_engine('sqlite:///test.sqlite')
-    session.bind = engine
 
-    load_conditions()
-    load_versions()
+    session = SessionClass(bind=engine)
 
-    with open(sys.argv[1], "rb") as f:
-        # Although the documentation for lxml discourages passing 
-        # unicode, that seem to be the only way to get it to use
-        # unicode strings in the tree.
-        xml = parse_xml(f)
+    load_conditions(session)
+    load_versions(session)
+
+    filename = sys.argv[1]
+
+    xml = parse_xml(filename)
 
     ctx = {}
     for game in xml.xpath('/wild/game'):
