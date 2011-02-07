@@ -6,6 +6,8 @@
 
 start = wild
 
+### Elements
+
 wild = element wild {
     element game {
         attribute version { version },
@@ -14,7 +16,7 @@ wild = element wild {
         element location {
             attribute name { text },
             element area {
-                attribute name { text },
+                attribute name { text }?,
                 attribute internal_id { integer }?,
 
                 monsters*
@@ -42,6 +44,9 @@ pokemon = element pokemon {
     attribute slot { integer }?
 }
 
+
+### Attributes
+
 conditions = (
     attribute season { "spring" | "summer" | "autumn" | "winter" }?,
     attribute time { "morning" | "day" | "night" }?,
@@ -53,6 +58,9 @@ conditions = (
     )?
 )
 
+
+### Walues
+
 version = ( "red" | "blue" | "yellow"
           | "gold" | "silver" | "crystal"
           | "ruby" | "sapphire" | "emerald" | "firered" | "leafgreen"
@@ -60,10 +68,19 @@ version = ( "red" | "blue" | "yellow"
           | "black" | "white"
           )
 
-method = text
+method = ( "walk" | "surf" | "fish"
+         | "old-rod" | "good-rod" | "super-rod"
+         | "rock-smash" | "headbutt"
+         )
+
 terrain = text
 
-langcode = text
 integer = xsd:integer
+
+# a 2-letter ISO 639-1 language code
+langcode = text
+
+# either a single integer, or two integers separated by a dash
+# examples: 35, 10-20
 range = text
 
