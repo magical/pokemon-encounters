@@ -8,9 +8,12 @@ from copy import deepcopy
 from operator import itemgetter
 from lxml.etree import parse as parse_xml
 
+import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
+
+sql_lower = sqlalchemy.func.lower
 
 from db import Encounter, EncounterCondition, EncounterConditionValue
 from db import EncounterMethod, EncounterTerrain, EncounterSlot
@@ -19,38 +22,102 @@ from db import Version
 
 SessionClass = sessionmaker()
 
+# Global are evil, but practically everything needs to access the session.
+# The alternative is to reformulate the whole module as a class, which brings
+# its own problems.
+session = SessionClass()
 
-_conditions = {}
-_condition_values = {}
-def load_conditions(session):
-    q = (session.query(EncounterConditionValue,
-                       EncounterCondition.identifier)
-            .join(EncounterCondition)
-            .order_by(EncounterCondition.id, EncounterConditionValue.id))
-    for cond_value_obj, cond in q.all():
-        cond_value = cond_value_obj.identifier
-        _conditions[cond, cond_value] = cond_value_obj
-        if cond not in _condition_values:
-            _condition_values[cond] = []
-        _condition_values[cond].append(cond_value)
+class memoize(object):
+    """A simple memoizer.
 
-def get_condition(cond, value):
-    return _conditions[unicode(cond), unicode(value)]
+    The wrapped function can only accept positional, hashable arguments.
+    """
 
+    def __init__(self, func):
+        self.func = func
+        self.memo = {}
+
+    def __call__(self, *args):
+        if args in self.memo:
+            return self.memo[args]
+        else:
+            value = self.func(*args)
+            self.memo[args] = value
+            return value
+
+@memoize
+def get_condition((cond, value)):
+    """Fetch the EncounterConditionValue for a given (cond,value) pair."""
+    q = session.query(EncounterConditionValue)
+    q = (q.join(EncounterCondition)
+          .filter(EncounterCondition.identifier == unicode(cond),
+                  EncounterConditionValue.identifier == unicode(value)))
+    return q.one()
+
+@memoize
+def get_conditions():
+    """Fetch all valid conditions identifiers."""
+    q = session.query(EncounterCondition.identifier)
+    q = q.order_by(EncounterCondition.id)
+    return [x.identifier for x in q.all()]
+
+@memoize
 def get_condition_values(cond):
-    return _condition_values[unicode(cond)]
+    """Fetch the list of values for the given condition."""
+    q = session.query(EncounterConditionValue.identifier)
+    q = (q.join(EncounterCondition)
+          .filter(EncounterCondition.identifier == unicode(cond))
+          .order_by(EncounterConditionValue.id))
+    values = [x.identifier for x in q.all()]
+    if not values:
+        raise ValueError(cond)
+    return values
 
-_versions = {}
-def load_versions(session):
-    q = session.query(Version)
-    for version in q.all():
-        _versions[version.name.lower()] = version
-
+@memoize
 def get_version(version):
-    return _versions[unicode(version)]
+    """Fetch the Version object for a given version identifier."""
+    q = session.query(Version)
+    q = q.filter(sql_lower(Version.name) == version)
+    return q.one()
 
-def encounter_add_condition(self, cond, value):
-    self.condition_values.append(get_condition(cond, value))
+@memoize
+def get_terrain_id(terrain):
+    """Fetch the id for a given terrain"""
+    q = session.query(EncounterTerrain.id).filter_by(identifier=terrain)
+    return q.one().id
+
+@memoize
+def get_method_id(method):
+    """Fetch the id for a given method"""
+    q = session.query(EncounterMethod.id).filter_by(identifier=method)
+    return q.one().id
+
+@memoize
+def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
+    terrain_id = None
+    if terrain is not None:
+        terrain_id = get_terrain_id(terrain)
+
+    method_id = get_method_id(method)
+
+    q = session.query(EncounterSlot).filter_by(
+        slot=slot,
+        version_group_id=version_group_id,
+        encounter_method_id=method_id,
+        encounter_terrain_id=terrain_id,
+    )
+    try:
+        x = q.one()
+    except NoResultFound:
+        x = EncounterSlot()
+        x.slot = slot
+        x.version_group_id = version_group_id
+        x.encounter_method_id = method_id
+        x.encounter_terrain_id = terrain_id
+    return x
+
+def get_or_create_encounter_slot(slot, method, version_group_id, terrain=None):
+    return _get_or_create_encounter_slot(slot, method, version_group_id, terrain)
 
 def parse_range(s):
     min, _, max = s.partition('-')
@@ -62,7 +129,7 @@ def parse_range(s):
         return min, min
 
 def lift_conditions(e):
-    all_conditions = set(a for a, b in _conditions)
+    all_conditions = get_conditions()
     conditions = {}
     for name in all_conditions:
         if name in e.attrib:
@@ -309,37 +376,18 @@ def _flatten(context, group):
         for p in _flatten(context, g):
             yield p
 
-def insert_encounters(session, ctx, encounters):
-    for e in encounters:
-        encounter = make_encounter(session, e, ctx)
-        session.add(encounter)
-    session.flush()
+def insert_encounters(encounters, ctx):
+    session.add_all(make_encounter(e, ctx) for e in encounters)
 
-def make_encounter(session, obj, ctx):
+def make_encounter(obj, ctx):
     """Make an db.Encounter object from a dict"""
 
-    #XXX not very efficient
-    def get_terrain_id(terrain):
-        return session.query(EncounterTerrain.id).filter_by(identifier=terrain).one()[0]
-    def get_method_id(method):
-        return session.query(EncounterMethod.id).filter_by(identifier=method).one()[0]
-    def get_or_create_encounter_slot(slot, method_id, version_group_id,
-                                     terrain_id=None):
-        q = session.query(EncounterSlot).filter_by(
-            slot=slot,
-            version_group_id=version_group_id,
-            encounter_method_id=method_id,
-            encounter_terrain_id=terrain_id,
-        )
-        try:
-            x = q.one()
-        except NoResultFound:
-            x = EncounterSlot()
-            x.slot=slot
-            x.version_group_id=version_group_id
-            x.encounter_method_id=method_id
-            x.encounter_terrain_id=terrain_id
-        return x
+    slot = get_or_create_encounter_slot(
+        slot = obj['slot'],
+        version_group_id = ctx['version'].version_group_id,
+        method = obj['method'],
+        terrain = obj['terrain'],
+    )
 
     e = Encounter()
 
@@ -349,20 +397,9 @@ def make_encounter(session, obj, ctx):
 
     e.version_id = ctx['version'].id
 
-    if obj['terrain'] is not None:
-        terrain_id = get_terrain_id(obj['terrain'])
-    else:
-        terrain_id = None
-    method_id = get_method_id(obj['method'])
-
-    e.slot = get_or_create_encounter_slot(
-        slot = obj['slot'],
-        version_group_id = ctx['version'].version_group_id,
-        method_id = method_id,
-        terrain_id = terrain_id,
-    )
-
     e.location_area = ctx['area']
+
+    e.slot = slot
 
     # Add levels
     if len(obj['levels']) == 1:
@@ -373,12 +410,13 @@ def make_encounter(session, obj, ctx):
         raise ValueError(obj['levels'])
 
     # Add conditions
-    for cond, value in obj['conditions'].iteritems():
-        c = get_condition(cond, value)
+    for cond_value in obj['conditions'].iteritems():
+        c = get_condition(cond_value)
         e.condition_values.append(c)
+
     return e
 
-def get_or_create_location(session, loc_elem, ctx):
+def get_or_create_location(loc_elem, ctx):
     name = unicode(loc_elem.get('name'))
     q = session.query(Location).filter_by(
         name=name,
@@ -390,10 +428,10 @@ def get_or_create_location(session, loc_elem, ctx):
         loc = Location()
         loc.name = name
         loc.region = ctx['region']
-        #session.add(loc)
+        session.add(loc)
     return loc
 
-def create_area(session, area_elem, ctx):
+def create_area(area_elem, ctx):
     name = area_elem.get('name')
     if name is not None:
         name = unicode(name)
@@ -402,7 +440,7 @@ def create_area(session, area_elem, ctx):
     area.name = name
     area.internal_id = int(area_elem.get('internal_id'))
     area.location = ctx['location']
-    #session.add(area)
+    session.add(area)
     return area
 
 
@@ -410,10 +448,8 @@ def create_area(session, area_elem, ctx):
 def main():
     engine = create_engine('sqlite:///test.sqlite')
 
-    session = SessionClass(bind=engine)
-
-    load_conditions(session)
-    load_versions(session)
+    session.bind = engine
+    session.autoflush = False
 
     filename = sys.argv[1]
 
@@ -422,23 +458,24 @@ def main():
     ctx = {}
     for game in xml.xpath('/wild/game'):
         ctx['version'] = get_version(game.get('version'))
-        # XXX
+        # XXX region should be set based on the location
         ctx['region'] = ctx['version'].version_group.generation.main_region
         for loc in game.xpath('location'):
-            ctx['location'] = get_or_create_location(session, loc, ctx)
+            ctx['location'] = get_or_create_location(loc, ctx)
             for area in loc.xpath('area'):
-                ctx['area'] = create_area(session, area, ctx)
+                ctx['area'] = create_area(area, ctx)
 
-                if area.get('name', ''):
+                if area.get('name', False):
                     print loc.get('name') + "/" + area.get('name')
                 else:
                     print loc.get('name')
 
-                encounters = reduce_encounters(area)
-                insert_encounters(session, ctx, encounters)
+                encounters = list(reduce_encounters(area))
+                insert_encounters(encounters, ctx)
                 #for e in sorted(encounters,
                 #                key=itemgetter('method', 'terrain')):
                 #    print e
+        session.flush()
     session.commit()
 
 
