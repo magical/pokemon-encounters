@@ -15,10 +15,10 @@ from sqlalchemy.orm.exc import NoResultFound
 
 sql_lower = sqlalchemy.func.lower
 
-from db import Encounter, EncounterCondition, EncounterConditionValue
-from db import EncounterMethod, EncounterTerrain, EncounterSlot
-from db import Location, LocationArea
-from db import Version
+from pokedex.db.tables import Encounter, EncounterCondition, EncounterConditionValue
+from pokedex.db.tables import EncounterTerrain, EncounterSlot
+from pokedex.db.tables import Location, LocationArea
+from pokedex.db.tables import Version
 
 SessionClass = sessionmaker()
 
@@ -45,33 +45,54 @@ class memoize(object):
             self.memo[args] = value
             return value
 
+# map veekun's condition names to mine
+condition_value_map = {
+    ('time', 'morning'): 'time-morning',
+    ('time', 'day'):     'time-day',
+    ('time', 'night'):   'time-night',
+    ('swarm', ''):      'swarm-no',
+    ('swarm', 'swarm'): 'swarm-yes',
+    ('radar', ''):      'radar-off',
+    ('radar', 'radar'): 'radar-on',
+    ('radio', ''):       'radio-off',
+    ('radio', 'hoenn'):  'radio-hoenn',
+    ('radio', 'sinnoh'): 'radio-sinnoh',
+    ('slot2', ''):          'slot2-none',
+    ('slot2', 'ruby'):      'slot2-ruby',
+    ('slot2', 'sapphire'):  'slot2-sapphire',
+    ('slot2', 'emerald'):   'slot2-emerald',
+    ('slot2', 'firered'):   'slot2-firered',
+    ('slot2', 'leafgreen'): 'slot2-leafgreen',
+}
+
+condition_values = {
+    'season': [],
+    'time': ['morning', 'day', 'night'],
+    'swarm': ['', 'swarm'],
+    'radar': ['', 'radar'],
+    'radio': ['', 'hoenn', 'sinnoh'],
+    'slot2': ['', 'ruby', 'sapphire', 'emerald', 'firered', 'leafgreen'],
+}
+
 @memoize
-def get_condition((cond, value)):
+def get_condition(cond_value):
     """Fetch the EncounterConditionValue for a given (cond,value) pair."""
+
+    identifier = condition_value_map[cond_value]
+
     q = session.query(EncounterConditionValue)
     q = (q.join(EncounterCondition)
-          .filter(EncounterCondition.identifier == unicode(cond),
-                  EncounterConditionValue.identifier == unicode(value)))
+          .filter(EncounterConditionValue.identifier == identifier))
     return q.one()
 
 @memoize
 def get_conditions():
     """Fetch all valid conditions identifiers."""
-    q = session.query(EncounterCondition.identifier)
-    q = q.order_by(EncounterCondition.id)
-    return [x.identifier for x in q.all()]
+    return condition_values.keys()
 
-@memoize
 def get_condition_values(cond):
     """Fetch the list of values for the given condition."""
-    q = session.query(EncounterConditionValue.identifier)
-    q = (q.join(EncounterCondition)
-          .filter(EncounterCondition.identifier == unicode(cond))
-          .order_by(EncounterConditionValue.id))
-    values = [x.identifier for x in q.all()]
-    if not values:
-        raise ValueError(cond)
-    return values
+    return condition_values[cond]
 
 @memoize
 def get_version(version):
@@ -89,22 +110,24 @@ def get_terrain_id(terrain):
 @memoize
 def get_method_id(method):
     """Fetch the id for a given method"""
-    q = session.query(EncounterMethod.id).filter_by(identifier=method)
+    # XXX EncounterTerrain
+    q = session.query(EncounterTerrain.id).filter_by(identifier=method)
     return q.one().id
 
 @memoize
 def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
     terrain_id = None
-    if terrain is not None:
-        terrain_id = get_terrain_id(terrain)
+    #if terrain is not None:
+    #    terrain_id = get_terrain_id(terrain)
 
     method_id = get_method_id(method)
 
     q = session.query(EncounterSlot).filter_by(
         slot=slot,
         version_group_id=version_group_id,
-        encounter_method_id=method_id,
-        encounter_terrain_id=terrain_id,
+        # XXX encounter_terrain_id
+        encounter_terrain_id=method_id,
+        #encounter_terrain_id=terrain_id,
     )
     try:
         x = q.one()
@@ -112,8 +135,9 @@ def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
         x = EncounterSlot()
         x.slot = slot
         x.version_group_id = version_group_id
-        x.encounter_method_id = method_id
-        x.encounter_terrain_id = terrain_id
+        # XXX encounter_terrain_id
+        x.encounter_terrain_id = method_id
+        #x.encounter_terrain_id = terrain_id
     return x
 
 def get_or_create_encounter_slot(slot, method, version_group_id, terrain=None):
@@ -164,7 +188,20 @@ def visit_monsters(elem):
     for monsters in elem.xpath('./monsters'):
         subgroups.append(visit_monsters(monsters))
 
+    #munge_monsters(obj)
+
     return obj
+
+#def munge_monsters(obj):
+#    if 'spots' in obj['conditions']:
+#        terrain = obj['terrain']
+#        if not terrain:
+#            terrain = obj['method']
+#
+#        obj['method'] 
+#        obj['method'] += '-spots'
+
+
 
 def visit_pokemon(elem, slot=None):
     assert elem.tag == 'pokemon'
@@ -219,7 +256,7 @@ class EncounterMonkey(object):
         # we really only have to check for season and time, since the others
         # should be caught in strip_redundancy().
         encounters = self.encounters
-        for cond in ('season', 'time'):
+        for cond in ('time',):
             encounters = self._collapse_encounters(encounters, cond)
         encounters.sort(key=self._sort_key, reverse=True)
         self.encounters = encounters
@@ -286,7 +323,6 @@ class EncounterMonkey(object):
         priority_groups = [
             ['season'],
             ['time'],
-            ['spots'],
             ['swarm', 'radar'], #XXX etc
         ]
 
@@ -431,22 +467,29 @@ def get_or_create_location(loc_elem, ctx):
         session.add(loc)
     return loc
 
+_areas = {}
 def create_area(area_elem, ctx):
     name = area_elem.get('name')
     if name is not None:
         name = unicode(name)
 
+    key = (ctx['location'], name)
+    if key in _areas:
+        return _areas[key]
+
     area = LocationArea()
     area.name = name
     area.internal_id = int(area_elem.get('internal_id'))
     area.location = ctx['location']
+
+    _areas[key] = area
     session.add(area)
     return area
 
 
 
 def main():
-    engine = create_engine('sqlite:///test.sqlite')
+    engine = create_engine('postgresql:///veekun-pokedex')
 
     session.bind = engine
     session.autoflush = False
@@ -475,7 +518,7 @@ def main():
                 #for e in sorted(encounters,
                 #                key=itemgetter('method', 'terrain')):
                 #    print e
-        session.flush()
+            session.flush()
     session.commit()
 
 
