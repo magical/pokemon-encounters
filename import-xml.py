@@ -11,7 +11,7 @@ from lxml.etree import parse as parse_xml
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 sql_lower = sqlalchemy.func.lower
 
@@ -460,7 +460,7 @@ def get_or_create_location(loc_elem, ctx):
     )
     try:
         loc = q.one()
-    except NoResultFound:
+    except (NoResultFound, MultipleResultsFound):
         loc = Location()
         loc.name = name
         loc.region = ctx['region']
@@ -502,7 +502,7 @@ def main():
     for game in xml.xpath('/wild/game'):
         ctx['version'] = get_version(game.get('version'))
         # XXX region should be set based on the location
-        ctx['region'] = ctx['version'].version_group.generation.main_region
+        ctx['region'] = ctx['version'].version_group.regions[0]
         for loc in game.xpath('location'):
             ctx['location'] = get_or_create_location(loc, ctx)
             for area in loc.xpath('area'):
