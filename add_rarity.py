@@ -1,7 +1,9 @@
+from warnings import warn
+
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///test-vee.sqlite')
+engine = create_engine('postgresql:///veekun-pokedex')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -18,7 +20,7 @@ rarities = {
 }
 
 for slot in session.query(EncounterSlot).all():
-    if slot.version_group_id in (5,6):
+    if slot.version_group_id in (5,6,7):
         rarity = None
         try:
             rarity = rarities[slot.terrain.identifier][slot.slot-1]
@@ -26,6 +28,8 @@ for slot in session.query(EncounterSlot).all():
             pass
 
         if rarity is not None:
+            if slot.rarity is not None and slot.rarity != rarity:
+                warn("replacing %d: %d%% with %d%%" % (slot.slot, slot.rarity, rarity))
             slot.rarity = rarity
             session.add(slot)
 
