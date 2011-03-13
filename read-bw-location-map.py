@@ -11,6 +11,8 @@ location_names_kana = list(map(str.strip,
     open("bw-location-names-kana", "r", encoding="utf-8")))
 location_names_kanji = list(map(str.strip,
     open("bw-location-names-kanji", "r", encoding="utf-8")))
+location_names_en = list(map(str.strip,
+    open("bw-locations-en", "r", encoding="utf-8")))
 
 class namespace(object):
     pass
@@ -32,11 +34,11 @@ def read_encounters():
 
         ns.kana = location_names_kana[ns.location_name_id]
         ns.kanji = location_names_kanji[ns.location_name_id]
+        ns.en = location_names_en[ns.location_name_id]
 
         yield ns
 
 
-print("encounter_id,location_kanji")
+print("encounter_id,location_internal_id,location_name")
 for x in read_encounters():
-    print("{x.encounter_id},\"{x.kanji}\"".format(x=x))
-
+    print("{x.encounter_id},{x.location_name_id},\"{x.en}\"".format(x=x))
