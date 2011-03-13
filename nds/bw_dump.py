@@ -218,8 +218,14 @@ def _dump_xml_record(parent, record):
     assert not (rates[1] and encounter_type != 0), (
         "doubles grass in non-grass area")
 
-    walk_terrain = 'grass'
-    if encounter_type == 1:
+    walk_terrain = ''
+    if encounter_type == 0:
+        # 0 can also mean undefined
+        # if spots are present, it's definitely grass;
+        # if doubles are, probably
+        if rates[1] or rates[2]:
+            walk_terrain = 'grass'
+    elif encounter_type == 1:
         walk_terrain = 'cave'
     elif encounter_type == 2:
         walk_terrain = 'bridge'
