@@ -2,13 +2,15 @@ from cStringIO import StringIO
 from struct import pack, unpack
 from lxml.etree import ElementTree, Element, SubElement
 from collections import defaultdict
+from itertools import groupby
+from operator import itemgetter
 
 from .narc import parse_narc
 
 
 SEASONS = ('spring', 'summer', 'autumn', 'winter')
 FORMS = {
-    550: ('red-stripe', 'blue-stripe'),
+    550: ('red-striped', 'blue-striped'),
     585: SEASONS,
     586: SEASONS,
 }
@@ -43,17 +45,22 @@ def _dump_record(writerow, location, season, record):
 ####
 
 def dump_text(narc_file, out):
-    load_names()
     records = parse_narc(narc_file)
 
     def write(*args, **kw):
         sep = kw.pop('sep', " ")
         end = kw.pop('end', "\n")
-        out.write(sep.join(str(x) for x in args))
+        out.write(sep.join(unicode(x).encode('utf-8') for x in args))
         out.write(end)
 
     for i, record in enumerate(records):
-        write("Location", i)
+        location, area = get_location_name(i)
+        if area:
+            name = u"{}/{}".format(location,area)
+        else:
+            name = location
+        write(u"{}: {}".format(i, name))
+        #write("Location", i)
         if len(record) > 232:
             for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 write(" {}:".format(season.capitalize()))
@@ -125,13 +132,8 @@ def _dumpencounter(write, chunk):
 #####
 
 def dump_xml(narc_file, out):
-    load_names()
-    load_locations()
-
     xml = to_xml(narc_file)
-    #XXX is it really utf-8?
-    out.write("""<?xml version="1.0" encoding="utf-8"?>\n""")
-    xml.write(out, pretty_print=True)
+    xml.write(out, pretty_print=True, encoding="utf-8", xml_declaration=True)
 
 def to_xml(narc_file):
     root = Element('wild')
@@ -192,8 +194,9 @@ def _dump_xml_record(parent, record):
             return
         monsters = SubElement(parent, 'monsters',
             method=method,
-            rate=str(rate)
         )
+        if not spots:
+            monsters.set('rate', str(rate))
         if terrain:
             monsters.set('terrain', terrain)
         if spots:
@@ -245,11 +248,25 @@ def load_locations():
     global locations
     if locations is None:
         import os.path, csv
-        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations.csv")
+        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations-redux.csv")
         f = open(locfile).read().splitlines()
         locations = {}
-        for row in csv.DictReader(f):
-            locations[int(row['id'])] = row['location'], row['area']
+        key = itemgetter('location')
+        rows = sorted(csv.DictReader(f), key=key)
+        for location, area_rows in groupby(rows, key):
+            area_rows = list(area_rows)
+            if len(area_rows) == 1 and area_rows[0]['area'] == "":
+                row = area_rows[0]
+                locations[int(row['id'])] = row['location'].decode('utf-8'), row['area']
+            else:
+                for row in area_rows:
+                    locations[int(row['id'])] = (
+                        row['location'].decode('utf-8'),
+                        row['area'] or "Unknown Area {}".format(row['id']),
+                    )
+
+load_names()
+load_locations()
 
 def get_location_name(location_id):
     if location_id in locations:
