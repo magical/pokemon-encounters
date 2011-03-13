@@ -115,6 +115,9 @@ def merge_areas(a, b):
     This function may raise NotEqual if the areas are too dissimilar.
 
     """
+    if a.get('rate') != b.get('rate'):
+        raise NotEqual
+
     methods_a = get_methods(a)
     methods_b = get_methods(b)
 
