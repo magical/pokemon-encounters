@@ -39,6 +39,6 @@ def read_encounters():
         yield ns
 
 
-print("encounter_id,location_internal_id,location_name")
+print("id,location_internal_id,location,area")
 for x in read_encounters():
-    print("{x.encounter_id},{x.location_name_id},\"{x.en}\"".format(x=x))
+    print("{x.encounter_id},{x.location_name_id},{x.en},".format(x=x))

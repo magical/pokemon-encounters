@@ -248,22 +248,18 @@ def load_locations():
     global locations
     if locations is None:
         import os.path, csv
-        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations-redux.csv")
+        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations.csv")
         f = open(locfile).read().splitlines()
         locations = {}
         key = itemgetter('location')
         rows = sorted(csv.DictReader(f), key=key)
         for location, area_rows in groupby(rows, key):
             area_rows = list(area_rows)
-            if len(area_rows) == 1 and area_rows[0]['area'] == "":
-                row = area_rows[0]
-                locations[int(row['id'])] = row['location'].decode('utf-8'), row['area']
-            else:
-                for row in area_rows:
-                    locations[int(row['id'])] = (
-                        row['location'].decode('utf-8'),
-                        row['area'] or "Unknown Area {}".format(row['id']),
-                    )
+            for row in area_rows:
+                locations[int(row['id'])] = (
+                    row['location'].decode('utf-8'),
+                    row['area']
+                )
 
 load_names()
 load_locations()

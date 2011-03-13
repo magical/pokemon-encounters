@@ -1,43 +1,113 @@
-id,location,area,terrain
-77,Route 1,,grass
-78,Route 2,,grass
-79,Route 3,,grass
-80,Underground Waterway Opening,Unknown Area 80,
-81,Underground Waterway Opening,Unknown Area 81,
-82,Route 4,,sand
-83,Route 5,,grass
-84,Route 6,,grass
-41,Electric Rock Cave,Unknown Area 41,
-42,Electric Rock Cave,Unknown Area 42,
-43,Electric Rock Cave,Unknown Area 43,
-9,Ancient Castle,Unknown Area 9,
-10,Ancient Castle,Unknown Area 10,
-11,Ancient Castle,Unknown Area 11,
-12,Ancient Castle,Unknown Area 12,
-13,Ancient Castle,Unknown Area 13,
-14,Ancient Castle,Unknown Area 14,
-15,Ancient Castle,Unknown Area 15,
-16,Ancient Castle,Unknown Area 16,
-17,Ancient Castle,Unknown Area 17,
-18,Ancient Castle,Unknown Area 18,
-19,Ancient Castle,Unknown Area 19,
-20,Ancient Castle,Unknown Area 20,
-21,Ancient Castle,Unknown Area 21,
-22,Ancient Castle,Unknown Area 22,
-23,Ancient Castle,Unknown Area 23,
-24,Ancient Castle,Unknown Area 24,
-25,Ancient Castle,Unknown Area 25,
-26,Ancient Castle,Unknown Area 26,
-27,Ancient Castle,Unknown Area 27,
-28,Ancient Castle,Unknown Area 28,
-29,Ancient Castle,Unknown Area 29,
-30,Ancient Castle,Unknown Area 30,
-31,Ancient Castle,Unknown Area 31,
-32,Ancient Castle,Unknown Area 32,
-33,Ancient Castle,Unknown Area 33,
-34,Ancient Castle,Unknown Area 34,
-35,Ancient Castle,Unknown Area 35,
-36,Ancient Castle,Unknown Area 36,
-37,Ancient Castle,Unknown Area 37,
-38,Ancient Castle,Unknown Area 38,
-39,Ancient Castle,Unknown Area 39,
+id,location_internal_id,location,area
+0,6,Striaton City,
+1,10,Driftveil City,
+2,12,Icirrus City,
+3,32,Dreamyard,
+4,32,Dreamyard,B1F
+5,33,Pinwheel Forest,outside
+6,33,Pinwheel Forest,inside
+7,34,Desert Resort,entrance
+8,34,Desert Resort,
+9,35,Relic Castle,a
+10,35,Relic Castle,a
+11,35,Relic Castle,b
+12,35,Relic Castle,b
+13,35,Relic Castle,b
+14,35,Relic Castle,b
+15,35,Relic Castle,c
+16,35,Relic Castle,c
+17,35,Relic Castle,c
+18,35,Relic Castle,c
+19,35,Relic Castle,c
+20,35,Relic Castle,c
+21,35,Relic Castle,c
+22,35,Relic Castle,c
+23,35,Relic Castle,c
+24,35,Relic Castle,c
+25,35,Relic Castle,c
+26,35,Relic Castle,c
+27,35,Relic Castle,c
+28,35,Relic Castle,c
+29,35,Relic Castle,c
+30,35,Relic Castle,d
+31,35,Relic Castle,d
+32,35,Relic Castle,c
+33,35,Relic Castle,b
+34,35,Relic Castle,b
+35,35,Relic Castle,b
+36,35,Relic Castle,b
+37,35,Relic Castle,b
+38,35,Relic Castle,a
+39,35,Relic Castle,a
+40,36,Cold Storage,
+41,37,Chargestone Cave,1F
+42,37,Chargestone Cave,B1F
+43,37,Chargestone Cave,B2F
+44,38,Twist Mountain,
+45,38,Twist Mountain,
+46,38,Twist Mountain,
+47,38,Twist Mountain,
+48,39,Dragonspiral Tower,Unknown Area 48
+49,39,Dragonspiral Tower,Unknown Area 49
+50,39,Dragonspiral Tower,1F
+51,39,Dragonspiral Tower,2F
+52,40,Victory Road,outside
+53,40,Victory Road,Unknown Area 53
+54,40,Victory Road,Unknown Area 54
+55,40,Victory Road,Unknown Area 55
+56,40,Victory Road,Unknown Area 56
+57,40,Victory Road,Unknown Area 57
+58,40,Victory Road,Unknown Area 58
+59,40,Victory Road,Unknown Area 59
+60,40,Victory Road,Unknown Area 60
+61,40,Victory Road,Unknown Area 61
+62,40,Victory Road,Unknown Area 62
+63,40,Victory Road,Unknown Area 63
+64,40,Victory Road,Unknown Area 64
+65,40,Victory Road,Unknown Area 65
+66,40,Victory Road,Unknown Area 66
+67,73,Trial Chamber,
+68,61,Giant Chasm,outside
+69,61,Giant Chasm,
+70,61,Giant Chasm,forest
+71,61,Giant Chasm,forest cave
+72,63,P2 Laboratory,
+73,71,Undella Bay,
+74,65,Driftveil Drawbridge,
+75,67,Village Bridge,
+76,68,Marvelous Bridge,
+77,14,Route 1,
+78,15,Route 2,
+79,16,Route 3,
+80,53,Wellspring Cave,
+81,53,Wellspring Cave,
+82,17,Route 4,
+83,18,Route 5,
+84,19,Route 6,
+85,54,Mistralton Cave,
+86,54,Mistralton Cave,
+87,74,Guidance Chamber,
+88,20,Route 7,
+89,56,Celestial Tower,2F
+90,56,Celestial Tower,3F
+91,56,Celestial Tower,4F
+92,56,Celestial Tower,5F
+93,21,Route 8,
+94,57,Moor of Icirrus,
+95,22,Route 9,
+96,59,Challenger's Cave,1F
+97,59,Challenger's Cave,B1F
+98,59,Challenger's Cave,B2F
+99,23,Route 10,Unknown Area 99
+100,23,Route 10,Unknown Area 100
+101,24,Route 11,
+102,25,Route 12,
+103,26,Route 13,
+104,27,Route 14,
+105,70,Abundant Shrine,
+106,28,Route 15,
+107,29,Route 16,
+108,72,Lostlorn Forest,
+109,31,Route 18,
+110,42,Undella Town,
+111,30,Route 17,
