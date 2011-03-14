@@ -2,13 +2,15 @@ from cStringIO import StringIO
 from struct import pack, unpack
 from lxml.etree import ElementTree, Element, SubElement
 from collections import defaultdict
+from itertools import groupby
+from operator import itemgetter
 
 from .narc import parse_narc
 
 
 SEASONS = ('spring', 'summer', 'autumn', 'winter')
 FORMS = {
-    550: ('red-stripe', 'blue-stripe'),
+    550: ('red-striped', 'blue-striped'),
     585: SEASONS,
     586: SEASONS,
 }
@@ -43,17 +45,22 @@ def _dump_record(writerow, location, season, record):
 ####
 
 def dump_text(narc_file, out):
-    load_names()
     records = parse_narc(narc_file)
 
     def write(*args, **kw):
         sep = kw.pop('sep', " ")
         end = kw.pop('end', "\n")
-        out.write(sep.join(str(x) for x in args))
+        out.write(sep.join(unicode(x).encode('utf-8') for x in args))
         out.write(end)
 
     for i, record in enumerate(records):
-        write("Location", i)
+        location, area = get_location_name(i)
+        if area:
+            name = u"{}/{}".format(location,area)
+        else:
+            name = location
+        write(u"{}: {}".format(i, name))
+        #write("Location", i)
         if len(record) > 232:
             for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 write(" {}:".format(season.capitalize()))
@@ -125,17 +132,14 @@ def _dumpencounter(write, chunk):
 #####
 
 def dump_xml(narc_file, out):
-    load_names()
-    load_locations()
-
     xml = to_xml(narc_file)
-    #XXX is it really utf-8?
-    out.write("""<?xml version="1.0" encoding="utf-8"?>\n""")
-    xml.write(out, pretty_print=True)
+    xml.write(out, pretty_print=True, encoding="utf-8", xml_declaration=True)
 
 def to_xml(narc_file):
+    version = 'black' # XXX
+
     root = Element('wild')
-    game = SubElement(root, 'game', version='black') # XXX
+    game = SubElement(root, 'game', version=version)
 
     def unpack_entry(entry):
         pokemon, min_level, max_level = unpack("<HBB", entry)
@@ -159,19 +163,20 @@ def to_xml(narc_file):
         location = locations[location_name]
         area = SubElement(location, 'area', name=area_name,
                                             internal_id=str(location_id))
+        swarm = get_swarm(version, location_id)
 
         if 232 < len(record):
             for season, subrecord in zip(SEASONS, chunkit(record, 232)):
                 m = Element('monsters', season=season)
-                _dump_xml_record(m, subrecord)
+                _dump_xml_record(m, subrecord, swarm)
                 if len(m):
                     area.append(m)
         else:
-            _dump_xml_record(area, record)
+            _dump_xml_record(area, record, swarm)
 
     return ElementTree(root)
 
-def _dump_xml_record(parent, record):
+def _dump_xml_record(parent, record, swarm=None):
     record = StringIO(record)
 
     rates = map(ord, record.read(8))
@@ -187,13 +192,14 @@ def _dump_xml_record(parent, record):
     fishing = _readencounters(record, 5)
     fishing_special = _readencounters(record, 5)
 
-    def something(method, terrain, spots, encounters, rate):
+    def something(method, terrain, spots, encounters, rate, swarm=None):
         if not rate:
             return
         monsters = SubElement(parent, 'monsters',
             method=method,
-            rate=str(rate)
         )
+        if not spots:
+            monsters.set('rate', str(rate))
         if terrain:
             monsters.set('terrain', terrain)
         if spots:
@@ -212,16 +218,32 @@ def _dump_xml_record(parent, record):
             else:
                 assert form_index == 0, (poke, form_index)
 
+        if swarm:
+            swarm_monsters = SubElement(monsters, 'monsters',
+                swarm='swarm',
+            )
+            SubElement(swarm_monsters, 'pokemon',
+                number=str(swarm),
+                name=names[swarm],
+                levels=fmtrange(0xf, 0x37),
+            )
+
     assert not (rates[1] and encounter_type != 0), (
         "doubles grass in non-grass area")
 
-    walk_terrain = 'grass'
-    if encounter_type == 1:
+    walk_terrain = ''
+    if encounter_type == 0:
+        # 0 can also mean undefined
+        # if spots are present, it's definitely grass;
+        # if doubles are, probably
+        if rates[1] or rates[2]:
+            walk_terrain = 'grass'
+    elif encounter_type == 1:
         walk_terrain = 'cave'
     elif encounter_type == 2:
         walk_terrain = 'bridge'
 
-    something('walk', walk_terrain, '',      grass,         rates[0])
+    something('walk', walk_terrain, '',      grass,         rates[0], swarm)
     something('walk', walk_terrain, 'spots', grass_special, rates[2])
     something('walk', 'dark-grass', '',      doubles,       rates[1])
 
@@ -248,11 +270,40 @@ def load_locations():
         locfile = os.path.join(os.path.dirname(__file__), "../bw-locations.csv")
         f = open(locfile).read().splitlines()
         locations = {}
+        key = itemgetter('location')
+        rows = sorted(csv.DictReader(f), key=key)
+        for location, area_rows in groupby(rows, key):
+            area_rows = list(area_rows)
+            for row in area_rows:
+                locations[int(row['id'])] = (
+                    row['location'].decode('utf-8'),
+                    row['area']
+                )
+
+swarms = None
+def load_swarms():
+    global swarms
+    if swarms is None:
+        import os.path, csv
+        swarmfile = os.path.join(os.path.dirname(__file__), "../bw-swarms.csv")
+        f = open(swarmfile).read().splitlines()
+        swarms = {}
         for row in csv.DictReader(f):
-            locations[int(row['id'])] = row['location'], row['area']
+            swarms.setdefault(row['version'], {})
+            swarms[row['version']][int(row['area_id'])] = int(row['pokemon_id'])
+
+load_names()
+load_locations()
+load_swarms()
 
 def get_location_name(location_id):
     if location_id in locations:
         return locations[location_id]
     else:
         return "BW Unknown", "Unknown Area {}".format(location_id)
+
+def get_swarm(version, location_id):
+    try:
+        return swarms[version][location_id]
+    except LookupError:
+        return None

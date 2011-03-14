@@ -5,6 +5,7 @@ from itertools import groupby
 from functools import reduce
 from copy import deepcopy
 import operator
+from collections import OrderedDict as odict
 
 class NotEqual(ValueError):
     pass
@@ -114,6 +115,9 @@ def merge_areas(a, b):
     This function may raise NotEqual if the areas are too dissimilar.
 
     """
+    if a.get('rate') != b.get('rate'):
+        raise NotEqual
+
     methods_a = get_methods(a)
     methods_b = get_methods(b)
 
@@ -162,8 +166,12 @@ def merge_areas(a, b):
 def collapse(xml):
     for eLocation in xml.xpath("/wild/game/location"):
         areas = eLocation.xpath("area")
-        areas = groupby(areas, lambda x: x.get('name', ''))
-        for area_name, group in areas:
+
+        grouped_areas = odict()
+        for area in areas:
+            grouped_areas.setdefault(area.get('name'), []).append(area)
+
+        for area_name, group in grouped_areas.items():
             group = list(group)
             if len(group) > 1:
                 # If the areas have the same name and are identical, collapse
