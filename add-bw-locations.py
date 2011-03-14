@@ -8,16 +8,22 @@ session = Session()
 
 from pokedex.db.tables import Location, LocationInternalID
 
-with open("bw-location-names-kanji-translated", "r", "utf-8") as f:
+with open("bw-locations-en", "r", "utf-8") as f:
     names = [line.rstrip("\n") for line in f]
 
+locations = {}
 for i, name in enumerate(names):
-    if i == 0:
+    if i == 0 or not name:
         continue
 
-    loc = Location()
-    loc.name = name
-    loc.region_id = 5 # Unova
+    if name in locations:
+        loc = locations[name]
+    else:
+        loc = Location()
+        loc.name = name
+        loc.region_id = 5 # Unova
+
+        locations[name] = loc
 
     lid = LocationInternalID()
     lid.location = loc
