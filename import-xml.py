@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 sql_lower = sqlalchemy.func.lower
 
 from pokedex.db.tables import Encounter, EncounterCondition, EncounterConditionValue
-from pokedex.db.tables import EncounterTerrain, EncounterSlot
+from pokedex.db.tables import EncounterMethod, EncounterTerrain, EncounterSlot
 from pokedex.db.tables import Location, LocationArea
 from pokedex.db.tables import Version
 
@@ -50,23 +50,32 @@ condition_value_map = {
     ('time', 'morning'): 'time-morning',
     ('time', 'day'):     'time-day',
     ('time', 'night'):   'time-night',
+
     ('swarm', ''):      'swarm-no',
     ('swarm', 'swarm'): 'swarm-yes',
+
     ('radar', ''):      'radar-off',
     ('radar', 'radar'): 'radar-on',
+
     ('radio', ''):       'radio-off',
     ('radio', 'hoenn'):  'radio-hoenn',
     ('radio', 'sinnoh'): 'radio-sinnoh',
+
     ('slot2', ''):          'slot2-none',
     ('slot2', 'ruby'):      'slot2-ruby',
     ('slot2', 'sapphire'):  'slot2-sapphire',
     ('slot2', 'emerald'):   'slot2-emerald',
     ('slot2', 'firered'):   'slot2-firered',
     ('slot2', 'leafgreen'): 'slot2-leafgreen',
+
+    ('season', 'spring'): 'season-spring',
+    ('season', 'summer'): 'season-summer',
+    ('season', 'autumn'): 'season-autumn',
+    ('season', 'winter'): 'season-winter',
 }
 
 condition_values = {
-    'season': [],
+    'season': ['spring', 'summer', 'autumn', 'winter'],
     'time': ['morning', 'day', 'night'],
     'swarm': ['', 'swarm'],
     'radar': ['', 'radar'],
@@ -110,24 +119,22 @@ def get_terrain_id(terrain):
 @memoize
 def get_method_id(method):
     """Fetch the id for a given method"""
-    # XXX EncounterTerrain
-    q = session.query(EncounterTerrain.id).filter_by(identifier=method)
+    q = session.query(EncounterMethod.id).filter_by(identifier=method)
     return q.one().id
 
 @memoize
 def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
     terrain_id = None
-    #if terrain is not None:
-    #    terrain_id = get_terrain_id(terrain)
+    if terrain is not None:
+        terrain_id = get_terrain_id(terrain)
 
     method_id = get_method_id(method)
 
     q = session.query(EncounterSlot).filter_by(
         slot=slot,
         version_group_id=version_group_id,
-        # XXX encounter_terrain_id
-        encounter_terrain_id=method_id,
-        #encounter_terrain_id=terrain_id,
+        encounter_method_id=method_id,
+        encounter_terrain_id=terrain_id,
     )
     try:
         x = q.one()
@@ -135,9 +142,8 @@ def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
         x = EncounterSlot()
         x.slot = slot
         x.version_group_id = version_group_id
-        # XXX encounter_terrain_id
-        x.encounter_terrain_id = method_id
-        #x.encounter_terrain_id = terrain_id
+        x.encounter_method_id = method_id
+        x.encounter_terrain_id = terrain_id
     return x
 
 def get_or_create_encounter_slot(slot, method, version_group_id, terrain=None):
@@ -188,19 +194,28 @@ def visit_monsters(elem):
     for monsters in elem.xpath('./monsters'):
         subgroups.append(visit_monsters(monsters))
 
-    #munge_monsters(obj)
+    munge_monsters(elem, obj)
 
     return obj
 
-#def munge_monsters(obj):
-#    if 'spots' in obj['conditions']:
-#        terrain = obj['terrain']
-#        if not terrain:
-#            terrain = obj['method']
-#
-#        obj['method'] 
-#        obj['method'] += '-spots'
+def munge_monsters(elem, obj):
+    if obj.get('method') == 'fish':
+        obj['method'] = 'super-rod'
 
+    if 'spots' in elem.attrib:
+        if elem.get('spots', ''):
+            obj['terrain'] += '-' + elem.get('spots')
+
+    for pokemon in obj['pokemon']:
+        # ignore deerling's & sawsbuck's forms;
+        # force basculin's
+        if pokemon['form'] is not None:
+            assert pokemon['pokemon_id'] in {550, 585, 586}
+
+            if pokemon['form'] == u'blue-striped':
+                pokemon['pokemon_id'] = 10016
+
+            pokemon['form'] = None
 
 
 def visit_pokemon(elem, slot=None):
@@ -256,7 +271,7 @@ class EncounterMonkey(object):
         # we really only have to check for season and time, since the others
         # should be caught in strip_redundancy().
         encounters = self.encounters
-        for cond in ('time',):
+        for cond in ('season', 'time'):
             encounters = self._collapse_encounters(encounters, cond)
         encounters.sort(key=self._sort_key, reverse=True)
         self.encounters = encounters
@@ -448,7 +463,7 @@ def make_encounter(obj, ctx):
     # Add conditions
     for cond_value in obj['conditions'].iteritems():
         c = get_condition(cond_value)
-        e.condition_values.append(c)
+        e.condition_value_objs.append(c)
 
     return e
 
