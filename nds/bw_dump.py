@@ -247,11 +247,11 @@ def _dump_xml_record(parent, record, swarm=None):
     something('walk', walk_terrain, 'spots', grass_special, rates[2])
     something('walk', 'dark-grass', '',      doubles,       rates[1])
 
-    something('surf', '', '',      water,         rates[3])
-    something('surf', '', 'spots', water_special, rates[4])
+    something('surf', 'water', '',      water,         rates[3])
+    something('surf', 'water', 'spots', water_special, rates[4])
 
-    something('fish', '', '',      fishing,         rates[5])
-    something('fish', '', 'spots', fishing_special, rates[6])
+    something('fish', 'water', '',      fishing,         rates[5])
+    something('fish', 'water', 'spots', fishing_special, rates[6])
 
 
 names = None
