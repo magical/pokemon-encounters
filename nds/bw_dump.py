@@ -7,6 +7,7 @@ from operator import itemgetter
 
 from .narc import parse_narc
 
+VERSIONS = ('black', 'white')
 
 SEASONS = ('spring', 'summer', 'autumn', 'winter')
 FORMS = {
@@ -132,14 +133,13 @@ def _dumpencounter(write, chunk):
 #####
 
 def dump_xml(narc_file, out):
-    xml = to_xml(narc_file)
+    root = Element('wild')
+    root.append(to_xml(narc_file, 'black')) # XXX
+    xml = ElementTree(root)
     xml.write(out, pretty_print=True, encoding="utf-8", xml_declaration=True)
 
-def to_xml(narc_file):
-    version = 'black' # XXX
-
-    root = Element('wild')
-    game = SubElement(root, 'game', version=version)
+def to_xml(narc_file, version):
+    game = Element('game', version=version)
 
     def unpack_entry(entry):
         pokemon, min_level, max_level = unpack("<HBB", entry)
@@ -174,7 +174,7 @@ def to_xml(narc_file):
         else:
             _dump_xml_record(area, record, swarm)
 
-    return ElementTree(root)
+    return game
 
 def _dump_xml_record(parent, record, swarm=None):
     record = StringIO(record)

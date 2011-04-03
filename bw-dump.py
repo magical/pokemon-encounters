@@ -1,10 +1,13 @@
+#!/usr/bin/env python2
+
 from sys import stdout
 
+from nds.bw_dump import to_xml, VERSIONS
+from lxml.etree import ElementTree, Element
 
-f = open("data/wild-black.narc", 'rb')
+root = Element('wild')
+for version in VERSIONS:
+    f = open("data/wild-%s.narc" % version, 'rb')
+    root.append(to_xml(f, version))
 
-#from nds.bw_dump import dump_text
-#dump_text(f, stdout)
-
-from nds.bw_dump import dump_xml
-dump_xml(f, stdout)
+ElementTree(root).write(stdout, encoding='utf-8', xml_declaration=True, pretty_print=True)
