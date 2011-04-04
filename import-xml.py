@@ -491,6 +491,10 @@ def create_area(area_elem, ctx):
     name = area_elem.get('name')
     if name is not None:
         name = unicode(name)
+    if ctx['location'].identifier == u'altering-cave':
+        ctx.setdefault('altering-cave', 0)
+        name = unichr(ord('a') + ctx['altering-cave'])
+        ctx['altering-cave'] += 1
 
     key = (ctx['location'], name)
     if key in _areas:
