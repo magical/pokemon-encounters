@@ -12,7 +12,7 @@ location_names_kana = list(map(str.strip,
 location_names_kanji = list(map(str.strip,
     open("bw-location-names-kanji", "r", encoding="utf-8")))
 location_names_en = list(map(str.strip,
-    open("bw-locations-en", "r", encoding="utf-8")))
+    open("bw-location-names-en", "r", encoding="utf-8")))
 
 class namespace(object):
     pass

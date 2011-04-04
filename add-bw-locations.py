@@ -6,32 +6,47 @@ engine = create_engine('postgresql:///veekun-pokedex')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-from pokedex.db.tables import Location, LocationInternalID
+from pokedex.db import identifier_from_name
+from pokedex.db.tables import Language
+from pokedex.db.tables import Location, LocationGameIndex
 
-with open("bw-locations-en", "r", "utf-8") as f:
-    names = [line.rstrip("\n") for line in f]
+en = session.query(Language).filter_by(identifier='en').one() # English
+ja = session.query(Language).filter_by(identifier='ja').one() # Japanese
+
+with open("bw-location-names-en", "r", "utf-8") as f:
+    en_names = [line.rstrip("\n") for line in f]
+with open("bw-location-names-kanji", "r", "utf-8") as f:
+    ja_names = [line.rstrip("\n") for line in f]
 
 locations = {}
-for i, name in enumerate(names):
-    if i == 0 or not name:
+for i, name in enumerate(zip(en_names, ja_names)):
+    if i == 0:
+        continue
+
+    en_name, ja_name = name
+    if not en_name:
         continue
 
     if name in locations:
         loc = locations[name]
     else:
         loc = Location()
-        loc.name = name
+        if en_name:
+            loc.name_map[en] = en_name
+        if ja_name:
+            loc.name_map[ja] = ja_name
         loc.region_id = 5 # Unova
+        loc.identifier = identifier_from_name(en_name)
 
         locations[name] = loc
 
-    lid = LocationInternalID()
-    lid.location = loc
-    lid.generation_id = 5 # Gen 5
-    lid.internal_id = i
+    lgi = LocationGameIndex()
+    lgi.location = loc
+    lgi.generation_id = 5 # Gen 5
+    lgi.game_index = i
 
     session.add(loc)
-    session.add(lid)
+    session.add(lgi)
 
 session.commit()
 
