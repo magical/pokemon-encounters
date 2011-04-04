@@ -1,10 +1,10 @@
 bank,num,location,area
 1,0,Viridian Forest,
-1,1,Mount Moon,1F
-1,2,Mount Moon,B1F
-1,3,Mount Moon,B2F
+1,1,Mt. Moon,1F
+1,2,Mt. Moon,B1F
+1,3,Mt. Moon,B2F
 1,4,S.S. Anne,
-1,37,DIGLETT's Cave,
+1,37,Diglett's Cave,
 1,39,Victory Road,1F
 1,40,Victory Road,2F
 1,41,Victory Road,3F
@@ -13,9 +13,9 @@ bank,num,location,area
 1,61,Pokémon Mansion,
 1,62,Pokémon Mansion,B1F
 1,63,Safari Zone,center
-1,64,Safari Zone,"right, area 1"
-1,65,Safari Zone,"top, area 2"
-1,66,Safari Zone,"left, area 3"
+1,64,Safari Zone,"Area 1, east"
+1,65,Safari Zone,"Area 2, north"
+1,66,Safari Zone,"Area 3, west"
 1,72,Cerulean Cave,1F
 1,73,Cerulean Cave,2F
 1,74,Cerulean Cave,B1F
