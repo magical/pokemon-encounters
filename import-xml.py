@@ -8,19 +8,22 @@ from copy import deepcopy
 from operator import itemgetter
 from lxml.etree import parse as parse_xml
 
-import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-sql_lower = sqlalchemy.func.lower
-
-from pokedex.db.tables import Encounter, EncounterCondition, EncounterConditionValue
-from pokedex.db.tables import EncounterMethod, EncounterTerrain, EncounterSlot
-from pokedex.db.tables import Location, LocationArea
+from pokedex.defaults import get_default_db_uri
+from pokedex.db import identifier_from_name
+from pokedex.db.multilang import MultilangSession
+from pokedex.db.tables import Language
+from pokedex.db.tables import (Encounter, EncounterCondition,
+                               EncounterConditionValue, EncounterMethod,
+                               EncounterSlot)
+from pokedex.db.tables import (Location, LocationArea,
+                               LocationAreaEncounterRate)
 from pokedex.db.tables import Version
 
-SessionClass = sessionmaker()
+SessionClass = sessionmaker(class_=MultilangSession)
 
 # Global are evil, but practically everything needs to access the session.
 # The alternative is to reformulate the whole module as a class, which brings
@@ -107,7 +110,7 @@ def get_condition_values(cond):
 def get_version(version):
     """Fetch the Version object for a given version identifier."""
     q = session.query(Version)
-    q = q.filter(sql_lower(Version.name) == version)
+    q = q.filter(Version.identifier == version)
     return q.one()
 
 @memoize
@@ -134,7 +137,7 @@ def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
         slot=slot,
         version_group_id=version_group_id,
         encounter_method_id=method_id,
-        encounter_terrain_id=terrain_id,
+        #encounter_terrain_id=terrain_id,
     )
     try:
         x = q.one()
@@ -143,7 +146,7 @@ def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
         x.slot = slot
         x.version_group_id = version_group_id
         x.encounter_method_id = method_id
-        x.encounter_terrain_id = terrain_id
+        #x.encounter_terrain_id = terrain_id
     return x
 
 def get_or_create_encounter_slot(slot, method, version_group_id, terrain=None):
@@ -323,7 +326,7 @@ class EncounterMonkey(object):
                 if k not in conditions:
                     conditions[k] = set()
                 conditions[k].add(v)
-        return conditions.keys() #XXX
+        return conditions.keys() #XXX sort?
 
     @staticmethod
     def _match(encounter, conditions):
@@ -477,7 +480,8 @@ def get_or_create_location(loc_elem, ctx):
         loc = q.one()
     except (NoResultFound, MultipleResultsFound):
         loc = Location()
-        loc.name = name
+        loc.name_map[en] = name
+        loc.identifier = identifier_from_name(name)
         loc.region = ctx['region']
         session.add(loc)
     return loc
@@ -493,8 +497,9 @@ def create_area(area_elem, ctx):
         return _areas[key]
 
     area = LocationArea()
-    area.name = name
-    area.internal_id = int(area_elem.get('internal_id'))
+    area.name_map[en] = name or u''
+    area.identifier = identifier_from_name(name) if name else u''
+    area.game_index = int(area_elem.get('internal_id'))
     area.location = ctx['location']
 
     _areas[key] = area
@@ -504,10 +509,14 @@ def create_area(area_elem, ctx):
 
 
 def main():
-    engine = create_engine('postgresql:///veekun-pokedex')
+    print get_default_db_uri()
+    engine = create_engine(get_default_db_uri())
 
     session.bind = engine
     session.autoflush = False
+
+    global en
+    en = session.query(Language).filter_by(identifier=u'en').one()
 
     filename = sys.argv[1]
 

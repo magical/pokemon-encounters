@@ -23,7 +23,7 @@ for slot in session.query(EncounterSlot).all():
     if slot.version_group_id in (5,6,7):
         rarity = None
         try:
-            rarity = rarities[slot.terrain.identifier][slot.slot-1]
+            rarity = rarities[slot.method.identifier][slot.slot-1]
         except LookupError:
             pass
 
