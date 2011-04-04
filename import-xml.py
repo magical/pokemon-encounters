@@ -507,6 +507,26 @@ def create_area(area_elem, ctx):
     return area
 
 
+def add_area_rates(area, ctx):
+    seen = {}
+    for monsters in area.findall('monsters'):
+        #print "monsters", monsters.get('rate'), monsters.get('method')
+        rate = monsters.get('rate')
+        method = monsters.get('method')
+        if rate and method:
+            if method in seen:
+                assert seen[method] == rate
+                continue
+            else:
+                seen[method] = rate
+
+            area_rate = LocationAreaEncounterRate()
+            area_rate.location_area = ctx['area']
+            area_rate.encounter_method_id = get_method_id(method)
+            area_rate.version_id = ctx['version'].id
+            area_rate.rate = int(rate)
+
+            session.add(area_rate)
 
 def main():
     print get_default_db_uri()
@@ -536,6 +556,8 @@ def main():
                     print loc.get('name') + "/" + area.get('name')
                 else:
                     print loc.get('name')
+
+                add_area_rates(area, ctx)
 
                 encounters = list(reduce_encounters(area))
                 insert_encounters(encounters, ctx)
