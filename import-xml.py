@@ -492,7 +492,6 @@ def create_area(area_elem, ctx):
     if name is not None:
         name = unicode(name)
     if ctx['location'].identifier == u'altering-cave':
-        ctx.setdefault('altering-cave', 0)
         name = unichr(ord('a') + ctx['altering-cave'])
         ctx['altering-cave'] += 1
 
@@ -551,6 +550,7 @@ def main():
         ctx['version'] = get_version(game.get('version'))
         # XXX region should be set based on the location
         ctx['region'] = ctx['version'].version_group.regions[0]
+        ctx['altering-cave'] = 0
         for loc in game.xpath('location'):
             ctx['location'] = get_or_create_location(loc, ctx)
             for area in loc.xpath('area'):
