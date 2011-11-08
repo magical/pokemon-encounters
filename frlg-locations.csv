@@ -8,9 +8,9 @@ bank,num,location,area
 1,39,Victory Road,1F
 1,40,Victory Road,2F
 1,41,Victory Road,3F
-1,59,Pokémon Mansion,
-1,60,Pokémon Mansion,
-1,61,Pokémon Mansion,
+1,59,Pokémon Mansion,1F-3F
+1,60,Pokémon Mansion,1F-3F
+1,61,Pokémon Mansion,1F-3F
 1,62,Pokémon Mansion,B1F
 1,63,Safari Zone,center
 1,64,Safari Zone,"Area 1, east"
