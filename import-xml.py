@@ -23,7 +23,7 @@ from pokedex.db.tables import (Location, LocationArea,
                                LocationAreaEncounterRate)
 from pokedex.db.tables import Version
 
-SessionClass = sessionmaker(class_=MultilangSession)
+SessionClass = sessionmaker(class_=MultilangSession, default_language_id=9)
 
 # Global are evil, but practically everything needs to access the session.
 # The alternative is to reformulate the whole module as a class, which brings
@@ -79,6 +79,7 @@ condition_value_map = {
 
 condition_values = {
     'season': ['spring', 'summer', 'autumn', 'winter'],
+    #'spots': ['', 'spots'],
     'time': ['morning', 'day', 'night'],
     'swarm': ['', 'swarm'],
     'radar': ['', 'radar'],
@@ -126,18 +127,14 @@ def get_method_id(method):
     return q.one().id
 
 @memoize
-def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
-    terrain_id = None
-    if terrain is not None:
-        terrain_id = get_terrain_id(terrain)
-
+def _get_or_create_encounter_slot(slot, method, version_group_id, spots):
     method_id = get_method_id(method)
 
     q = session.query(EncounterSlot).filter_by(
         slot=slot,
         version_group_id=version_group_id,
         encounter_method_id=method_id,
-        #encounter_terrain_id=terrain_id,
+        #spots=spots,
     )
     try:
         x = q.one()
@@ -146,11 +143,11 @@ def _get_or_create_encounter_slot(slot, method, version_group_id, terrain):
         x.slot = slot
         x.version_group_id = version_group_id
         x.encounter_method_id = method_id
-        #x.encounter_terrain_id = terrain_id
+        #x.spots = spots
     return x
 
-def get_or_create_encounter_slot(slot, method, version_group_id, terrain=None):
-    return _get_or_create_encounter_slot(slot, method, version_group_id, terrain)
+def get_or_create_encounter_slot(slot, method, version_group_id, spots=False):
+    return _get_or_create_encounter_slot(slot, method, version_group_id, spots)
 
 def parse_range(s):
     min, _, max = s.partition('-')
@@ -186,6 +183,8 @@ def visit_monsters(elem):
         obj['terrain'] = elem.get('terrain')
     if 'rate' in elem.attrib:
         obj['rate'] = int(elem.get('rate'))
+    if 'spots' in elem.attrib:
+        obj['spots'] = elem.get('spots')
 
     obj['conditions'] = lift_conditions(elem)
 
@@ -195,6 +194,8 @@ def visit_monsters(elem):
 
     obj['subgroups'] = subgroups = []
     for monsters in elem.xpath('./monsters'):
+        if 'swarm' in monsters.attrib:
+            continue
         subgroups.append(visit_monsters(monsters))
 
     munge_monsters(elem, obj)
@@ -205,9 +206,15 @@ def munge_monsters(elem, obj):
     if obj.get('method') == 'fish':
         obj['method'] = 'super-rod'
 
-    if 'spots' in elem.attrib:
-        if elem.get('spots', ''):
-            obj['terrain'] += '-' + elem.get('spots')
+    if obj.get('terrain') == 'dark-grass':
+        obj['method'] = 'dark-grass'
+        del obj['terrain']
+
+    if obj.get('spots') == 'spots':
+        if obj['method'] == 'walk':
+            obj['method'] = obj['terrain'] + '-spots'
+        else:
+            obj['method'] += '-spots'
 
     for pokemon in obj['pokemon']:
         # ignore deerling's & sawsbuck's forms;
@@ -216,7 +223,7 @@ def munge_monsters(elem, obj):
             assert pokemon['pokemon_id'] in {550, 585, 586}
 
             if pokemon['form'] == u'blue-striped':
-                pokemon['pokemon_id'] = 10016
+                pokemon['pokemon_id'] = 665
 
             pokemon['form'] = None
 
@@ -440,7 +447,7 @@ def make_encounter(obj, ctx):
         slot = obj['slot'],
         version_group_id = ctx['version'].version_group_id,
         method = obj['method'],
-        terrain = obj['terrain'],
+        #spots = obj['spots'],
     )
 
     e = Encounter()
@@ -456,35 +463,22 @@ def make_encounter(obj, ctx):
     e.slot = slot
 
     # Add levels
-    if len(obj['levels']) == 1:
-        e.min_level = e.max_level = obj['levels'][0]
-    elif len(obj['levels']) == 2:
-        e.min_level, e.max_level = obj['levels']
-    else:
-        raise ValueError(obj['levels'])
+    e.min_level, e.max_level = obj['levels']
 
     # Add conditions
     for cond_value in obj['conditions'].iteritems():
         c = get_condition(cond_value)
-        e.condition_value_objs.append(c)
+        e.condition_values.append(c)
 
     return e
 
-def get_or_create_location(loc_elem, ctx):
+def get_location(loc_elem, ctx):
     name = unicode(loc_elem.get('name'))
     q = session.query(Location).filter_by(
         name=name,
         region_id=ctx['region'].id,
     )
-    try:
-        loc = q.one()
-    except (NoResultFound, MultipleResultsFound):
-        loc = Location()
-        loc.name_map[en] = name
-        loc.identifier = identifier_from_name(name)
-        loc.region = ctx['region']
-        session.add(loc)
-    return loc
+    return q.one()
 
 _areas = {}
 def create_area(area_elem, ctx):
@@ -516,6 +510,8 @@ def add_area_rates(area, ctx):
         #print "monsters", monsters.get('rate'), monsters.get('method')
         rate = monsters.get('rate')
         method = monsters.get('method')
+        if method == 'fish':
+            method = 'super-rod'
         if rate and method:
             if method in seen:
                 assert seen[method] == rate
@@ -552,7 +548,7 @@ def main():
         ctx['region'] = ctx['version'].version_group.regions[0]
         ctx['altering-cave'] = 0
         for loc in game.xpath('location'):
-            ctx['location'] = get_or_create_location(loc, ctx)
+            ctx['location'] = get_location(loc, ctx)
             for area in loc.xpath('area'):
                 ctx['area'] = create_area(area, ctx)
 

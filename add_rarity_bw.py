@@ -3,7 +3,7 @@ from warnings import warn
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('postgresql:///veekun-pokedex')
+engine = create_engine('postgresql:///veekun3-pokedex')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -15,6 +15,10 @@ rarities = {
     'super-rod': [40, 40, 15, 4, 1],
     'surf': [60, 30, 5, 4, 1],
 }
+for m in ('dark-grass', 'cave-spots', 'grass-spots', 'bridge-spots'):
+    rarities[m] = rarities['walk']
+rarities['super-rod-spots'] = rarities['super-rod']
+rarities['surf-spots'] = rarities['surf']
 
 for slot in session.query(EncounterSlot).all():
     if slot.version_group_id in (11,):
