@@ -47,8 +47,8 @@ id,location_internal_id,location,area
 45,38,Twist Mountain,
 46,38,Twist Mountain,
 47,38,Twist Mountain,
-48,39,Dragonspiral Tower,Unknown Area 48
-49,39,Dragonspiral Tower,Unknown Area 49
+48,39,Dragonspiral Tower,entrance
+49,39,Dragonspiral Tower,outside
 50,39,Dragonspiral Tower,1F
 51,39,Dragonspiral Tower,2F
 52,40,Victory Road,outside
@@ -98,8 +98,8 @@ id,location_internal_id,location,area
 96,59,Challenger's Cave,1F
 97,59,Challenger's Cave,B1F
 98,59,Challenger's Cave,B2F
-99,23,Route 10,Unknown Area 99
-100,23,Route 10,Unknown Area 100
+99,23,Route 10,
+100,23,Route 10,Victory Road gate
 101,24,Route 11,
 102,25,Route 12,
 103,26,Route 13,
