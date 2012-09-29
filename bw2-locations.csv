@@ -1,0 +1,136 @@
+id,location_internal_id,location,area
+0,6,Striaton City,
+1,8,Castelia City,
+2,12,Icirrus City,
+99,14,Route 1,
+100,15,Route 2,
+101,16,Route 3,
+104,17,Route 4,
+105,17,Route 4,
+106,18,Route 5,
+107,19,Route 6,
+111,20,Route 7,
+116,21,Route 8,
+118,22,Route 9,
+119,24,Route 11,
+120,25,Route 12,
+121,26,Route 13,
+122,27,Route 14,
+124,28,Route 15,
+125,29,Route 16,
+133,30,Route 17,
+127,31,Route 18,
+6,32,Dreamyard,
+7,32,Dreamyard,B1F
+8,33,Pinwheel Forest,outside
+9,33,Pinwheel Forest,inside
+10,34,Desert Resort,entrance
+11,34,Desert Resort,
+12,35,Relic Castle,a
+13,35,Relic Castle,a
+14,35,Relic Castle,c
+15,35,Relic Castle,c
+16,35,Relic Castle,c
+17,35,Relic Castle,c
+18,35,Relic Castle,d
+19,35,Relic Castle,d
+20,37,Chargestone Cave,1F
+21,37,Chargestone Cave,B1F
+22,37,Chargestone Cave,B2F
+23,38,Twist Mountain,
+24,38,Twist Mountain,
+25,38,Twist Mountain,
+26,38,Twist Mountain,
+27,39,Dragonspiral Tower,entrance
+28,39,Dragonspiral Tower,outside
+29,39,Dragonspiral Tower,1F
+30,39,Dragonspiral Tower,2F
+31,40,Victory Road,7F
+132,42,Undella Town,
+102,53,Wellspring Cave,
+103,53,Wellspring Cave,
+108,54,Mistralton Cave,
+109,54,Mistralton Cave,
+112,56,Celestial Tower,2F
+113,56,Celestial Tower,3F
+114,56,Celestial Tower,4F
+115,56,Celestial Tower,5F
+117,57,Moor of Icirrus,
+32,61,Giant Chasm,outside
+33,61,Giant Chasm,
+34,61,Giant Chasm,forest
+35,61,Giant Chasm,forest cave
+36,61,Giant Chasm,
+42,63,P2 Laboratory,
+96,65,Driftveil Drawbridge,
+97,67,Village Bridge,
+98,68,Marvelous Bridge,
+123,70,Abundant Shrine,
+43,71,Undella Bay,
+126,72,Lostlorn Forest,
+110,74,Guidance Chamber,
+3,117,Aspertia City,
+4,118,Virbank City,
+5,119,Humilau City,
+128,124,Route 19,
+129,125,Route 20,
+134,126,Route 21,
+130,127,Route 22,
+131,128,Route 23,
+37,129,Castelia Sewers,
+38,129,Castelia Sewers,unknown area 38
+39,129,Castelia Sewers,
+40,129,Castelia Sewers,
+41,129,Castelia Sewers,
+44,130,Floccesy Ranch,outer
+45,130,Floccesy Ranch,inner
+46,131,Virbank Complex,outer
+47,131,Virbank Complex,inner
+48,132,Reversal Mountain,unknown area 48
+49,132,Reversal Mountain,unknown area 49
+50,132,Reversal Mountain,unknown area 50
+51,132,Reversal Mountain,unknown area 51
+52,132,Reversal Mountain,unknown area 52
+53,132,Reversal Mountain,unknown area 53
+54,132,Reversal Mountain,unknown area 54
+55,132,Reversal Mountain,unknown area 55
+56,132,Reversal Mountain,unknown area 56
+57,132,Reversal Mountain,unknown area 57
+58,132,Reversal Mountain,unknown area 58
+59,132,Reversal Mountain,unknown area 59
+60,132,Reversal Mountain,unknown area 60
+61,133,Strange House,1F
+62,133,Strange House,1F
+63,133,Strange House,1F
+64,133,Strange House,1F
+65,133,Strange House,B1F
+66,133,Strange House,1F
+67,133,Strange House,B1F
+68,133,Strange House,B1F
+69,133,Strange House,B1F
+70,133,Strange House,B1F
+71,134,Victory Road,unknown area 71
+72,134,Victory Road,unknown area 72
+73,134,Victory Road,unknown area 73
+74,134,Victory Road,unknown area 74
+75,134,Victory Road,unknown area 75
+76,134,Victory Road,unknown area 76
+77,134,Victory Road,unknown area 77
+78,134,Victory Road,unknown area 78
+79,134,Victory Road,unknown area 79
+80,134,Victory Road,unknown area 80
+81,136,Relic Passage,Castelia Sewers entrance
+82,136,Relic Passage,Relic Castle entrance
+83,136,Relic Passage,PWT entrance
+84,137,Clay Tunnel,
+85,137,Clay Tunnel,
+86,137,Clay Tunnel,
+93,141,Seaside Cave,1F
+94,141,Seaside Cave,B1F
+95,147,Nature Sanctuary,
+87,149,Underground Ruins,
+88,149,Underground Ruins,
+89,149,Underground Ruins,
+90,150,Rocky Mountain Room,
+91,151,Glacier Room,
+92,152,Iron Room,

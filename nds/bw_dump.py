@@ -15,6 +15,7 @@ FORMS = {
     585: SEASONS,
     586: SEASONS,
 }
+CORPHISH = 341
 
 
 def chunkit(seq, n):
@@ -98,7 +99,7 @@ def _dumpencounter(write, chunk):
             except IndexError:
                 pass
             text.append("Lv.%s %s" % (fmtrange(*levels), name))
-            if pok in (550, 585, 586):
+            if pok in (550, 585, 586) or form:
                 text[-1] += " Form#%s" % form
             else:
                 assert form == 0
@@ -215,6 +216,9 @@ def _dump_xml_record(parent, record, swarm=None):
             if poke in FORMS:
                 form = FORMS[poke][form_index]
                 e.set('form', str(form))
+            elif poke == CORPHISH:
+                # in bw2 there is one instance of corphish having form=1
+                pass
             else:
                 assert form_index == 0, (poke, form_index)
 
@@ -267,7 +271,7 @@ def load_locations():
     global locations
     if locations is None:
         import os.path, csv
-        locfile = os.path.join(os.path.dirname(__file__), "../bw-locations.csv")
+        locfile = os.path.join(os.path.dirname(__file__), "../bw2-locations.csv")
         f = open(locfile).read().splitlines()
         locations = {}
         key = itemgetter('location')

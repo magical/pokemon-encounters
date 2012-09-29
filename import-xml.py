@@ -110,6 +110,10 @@ def get_condition_values(cond):
 @memoize
 def get_version(version):
     """Fetch the Version object for a given version identifier."""
+    if version == 'black2':
+        version = 'black-2'
+    elif version == 'white2':
+        version = 'white-2'
     q = session.query(Version)
     q = q.filter(Version.identifier == version)
     return q.one()
@@ -478,13 +482,12 @@ def get_location(loc_elem, ctx):
         name=name,
         region_id=ctx['region'].id,
     )
-    return q.one()
+    return q.first()
 
 _areas = {}
-def create_area(area_elem, ctx):
-    name = area_elem.get('name')
-    if name is not None:
-        name = unicode(name)
+def get_or_create_area(area_elem, ctx):
+    name = unicode(area_elem.get('name', u''))
+
     if ctx['location'].identifier == u'altering-cave':
         name = unichr(ord('a') + ctx['altering-cave'])
         ctx['altering-cave'] += 1
@@ -493,14 +496,21 @@ def create_area(area_elem, ctx):
     if key in _areas:
         return _areas[key]
 
-    area = LocationArea()
-    area.name_map[en] = name or u''
-    area.identifier = identifier_from_name(name) if name else u''
-    area.game_index = int(area_elem.get('internal_id'))
-    area.location = ctx['location']
+    q = session.query(LocationArea).filter_by(
+        name=name,
+        location_id=ctx['location'].id,
+    )
+    try:
+        area = q.one()
+    except NoResultFound:
+        area = LocationArea()
+        area.name_map[en] = name
+        area.identifier = identifier_from_name(name) if name else u''
+        area.game_index = int(area_elem.get('internal_id'))
+        area.location = ctx['location']
+        session.add(area)
 
     _areas[key] = area
-    session.add(area)
     return area
 
 
@@ -510,8 +520,12 @@ def add_area_rates(area, ctx):
         #print "monsters", monsters.get('rate'), monsters.get('method')
         rate = monsters.get('rate')
         method = monsters.get('method')
+        terrain = monsters.get('terrain')
         if method == 'fish':
             method = 'super-rod'
+        if terrain == 'dark-grass':
+            method = 'dark-grass'
+
         if rate and method:
             if method in seen:
                 assert seen[method] == rate
@@ -550,7 +564,7 @@ def main():
         for loc in game.xpath('location'):
             ctx['location'] = get_location(loc, ctx)
             for area in loc.xpath('area'):
-                ctx['area'] = create_area(area, ctx)
+                ctx['area'] = get_or_create_area(area, ctx)
 
                 if area.get('name', False):
                     print loc.get('name') + "/" + area.get('name')

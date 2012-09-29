@@ -3,7 +3,7 @@ from warnings import warn
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('postgresql:///veekun3-pokedex')
+engine = create_engine('postgresql:///veekun2012')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -21,7 +21,7 @@ rarities['super-rod-spots'] = rarities['super-rod']
 rarities['surf-spots'] = rarities['surf']
 
 for slot in session.query(EncounterSlot).all():
-    if slot.version_group_id in (11,):
+    if slot.version_group_id in (11, 14):
         rarity = rarities[slot.method.identifier][slot.slot-1]
 
         if rarity is not None:
